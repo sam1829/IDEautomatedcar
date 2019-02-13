@@ -114,6 +114,8 @@ void initGPIO(void)
 	GPIOB_PSOR = (1UL << 21) | (1UL << 22);
 
 	// Set the push buttons as an input
+	GPIOC_PDDR = (0 << 6);
+	GPIOA_PDDR = (0 << 4);
 
 	// interrupt configuration for SW3(Rising Edge) and SW2 (Either)
 
