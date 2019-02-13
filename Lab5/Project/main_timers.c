@@ -89,13 +89,13 @@ void initFTM(void)
 	//(Sysclock/128)/1000- slow down by a factor of 1000 to go from
 	//Mhz to Khz, then 1/KHz = msec
 	//Every 1msec, the FTM counter will set the overflow flag (TOF) and
-	FTM0->MOD = (DEFAULT_SYSTEM_CLOCK/(1 << 7)) / 1000;
+	FTM0_MOD = (DEFAULT_SYSTEM_CLOCK/(1 << 7)) / 1000;
 
 	//Select the System Clock
-	FTM0_SC |= (FTM_SC_CLKS_MASK & (1 << 3);
+	FTM0_SC |= (FTM_SC_CLKS_MASK & (1 << 3));
 
 	//Enable the interrupt mask. Timer overflow Interrupt enable
-	FTM0_SC |= (FTM0_SC_TOIE_MASK & (1 << 6);
+	FTM0_SC |= (FTM_SC_TOIE_MASK & (1 << 6));
 
 	return;
 }
@@ -103,8 +103,8 @@ void initFTM(void)
 void initGPIO(void)
 {
 	
-	SW2 = PTC6 (ALT1)
-	SW3 = PTA4 (ALT1)
+	/* SW2 = PTC6 (ALT1);
+	SW3 = PTA4 (ALT1); */
 
 	// initialize push buttons and LEDs
 	LED_Init();
@@ -123,6 +123,7 @@ void initGPIO(void)
 	// Switch the GPIO pins to output mode (Red and Blue LEDs)
 	GPIOB_PDDR |= (1 << 22);
 	GPIOB_PDDR |= (1 << 21);
+
 	// Turn off the LEDs
 	GPIOB_PSOR = (1UL << 21) | (1UL << 22);
 
@@ -153,14 +154,17 @@ void LED_Init(void)
 	// Enable clocks on Ports B and E for LED timing
 	SIM_SCGC5 |= SIM_SCGC5_PORTB_MASK;
 	SIM_SCGC5 |= SIM_SCGC5_PORTE_MASK;
+
 	// Configure the Signal Multiplexer for GPIO
 	PORTB_PCR21 |= PORT_PCR_MUX(1);
 	PORTB_PCR22 |= PORT_PCR_MUX(1);
 	PORTE_PCR26 |= PORT_PCR_MUX(1);
+	
 	// Switch the GPIO pins to output mode
 	GPIOB_PDDR |= (1 << 22);
 	GPIOE_PDDR |= (1 << 26);
 	GPIOB_PDDR |= (1 << 21);
+	
 	// Turn off the LEDs
 	GPIOB_PSOR = (1UL << 21) | (1UL << 22);
 	GPIOE_PSOR = 1UL << 26;
