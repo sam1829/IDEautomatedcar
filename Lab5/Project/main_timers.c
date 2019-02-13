@@ -54,10 +54,12 @@ void initPDB(void)
 
 	// Set continuous mode, prescaler of 128, multiplication factor of 20,
 	// software triggering, and PDB enabled
-
+	PDB0_SC |= PDB_SC_CONT_MASK | PDB_SC_PRESCALER(7) | PDB_SC_MULT(3) | PDB_SC_SWTRIG_MASK | PDB_SC_PDBEN_MASK;
+	
 	//Set the mod field to get a 1 second period.
 	//There is a division by 2 to make the LED blinking period 1 second.
 	//This translates to two mod counts in one second (one for on, one for off)
+	PDB0_MOD = 50000; // TODO: not right
 
 	//Configure the Interrupt Delay register.
 	PDB0_IDLY = 10;
