@@ -31,7 +31,7 @@ void ADC1_INIT(void)
 
     // Configure CFG Registers
     // Configure ADC to divide 50 MHz down to 6.25 MHz AD Clock, 16-bit single ended
-    // TODO: (Insert your code here.)
+    ADC1_CFG1 = ADC_CFG1_ADIV(3) | ADC_CFG1_MODE(3);
 
     // Do ADC Calibration for Singled Ended ADC. Do not touch.
     ADC1_SC3 = ADC_SC3_CAL_MASK;
@@ -49,14 +49,13 @@ void ADC1_INIT(void)
 
     // Configure SC registers.
     // Select hardware trigger.
-    //TODO: (Insert your code here.)
+    ADC1_SC2 |= ADC_SC2_ADTRG_MASK;
 
     // Configure SC1A register.
     // Select ADC Channel and enable interrupts. Use ADC1 channel DADP3  in single ended mode.
-    //TODO: (Insert your code here.)
+    ADC1_SC1A |= ADC_SC1_ADCH(3) | ADC_SC1_AIEN_MASK;
 
     // Enable NVIC interrupt
-    //(Insert your code here.)
     NVIC_EnableIRQ(ADC1_IRQn);
 }
 
