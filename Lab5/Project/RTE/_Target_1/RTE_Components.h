@@ -3,7 +3,7 @@
  * Auto generated Run-Time-Environment Component Configuration File
  *      *** Do not modify ! ***
  *
- * Project: 'ADC' 
+ * Project: 'timers_interrupts' 
  * Target:  'Target 1' 
  */
 
