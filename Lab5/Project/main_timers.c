@@ -49,16 +49,16 @@ int main(void)
 void initPDB(void)
 {
 	//Enable clock for PDB module
-	SIM_SCGC6 = SIM_SCGC6_PDB_MASK;
+	SIM_SCGC6 |= SIM_SCGC6_PDB_MASK;
 
 	// Set continuous mode, prescaler of 128, multiplication factor of 20,
 	// software triggering, and PDB enabled
-	PDB0_SC |= PDB_SC_CONT_MASK | PDB_SC_PRESCALER(7) | PDB_SC_MULT(3) | PDB_SC_SWTRIG_MASK | PDB_SC_PDBEN_MASK;
+	PDB0_SC |= PDB_SC_CONT_MASK | PDB_SC_PRESCALER(7) | PDB_SC_MULT(3) | PDB_SC_TRGSEL(15) | PDB_SC_PDBEN_MASK;
 	
 	//Set the mod field to get a 1 second period.
 	//There is a division by 2 to make the LED blinking period 1 second.
 	//This translates to two mod counts in one second (one for on, one for off)
-	PDB0_MOD = (DEFAULT_SYSTEM_CLOCK/((1 << 7)* 20)); //TODO: fix
+	PDB0_MOD = (DEFAULT_SYSTEM_CLOCK/((1 << 7)* 20))/2; //TODO: should be right maybe
 
 	//Configure the Interrupt Delay register.
 	PDB0_IDLY = 10;
@@ -103,16 +103,13 @@ void initFTM(void)
 
 void initGPIO(void)
 {
-	
-	/* SW2 = PTC6 (ALT1);
-	SW3 = PTA4 (ALT1); */
 
 	// initialize push buttons and LEDs
 	LED_Init();
 	Button_Init();
 	uart_init();
 
-	// initialize clocks for each different port used.
+	/* // initialize clocks for each different port used.
 	SIM_SCGC5 |= SIM_SCGC5_PORTC_MASK;
 	SIM_SCGC5 |= SIM_SCGC5_PORTA_MASK;
 
@@ -126,7 +123,7 @@ void initGPIO(void)
 	GPIOB_PDDR |= (1 << 21);
 
 	// Turn off the LEDs
-	GPIOB_PSOR = (1UL << 21) | (1UL << 22);
+	GPIOB_PSOR = (1UL << 21) | (1UL << 22); */
 
 	// Set the push buttons as an input
 	GPIOC_PDDR = (0 << 6);
