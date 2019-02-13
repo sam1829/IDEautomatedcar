@@ -49,6 +49,8 @@ int main(void)
 void initPDB(void)
 {
 	//Enable clock for PDB module
+	SIM_SCGC6 = SIM_SCGC6_PDB_MASK;
+	SIM_SCGC5 |= SIM_SCGC5_PORTC_MASK;
 
 	// Set continuous mode, prescaler of 128, multiplication factor of 20,
 	// software triggering, and PDB enabled
@@ -61,6 +63,7 @@ void initPDB(void)
 	PDB0_IDLY = 10;
 
 	//Enable the interrupt mask.
+	NVIC_EnableIRQ(PDB0_IRQn);
 
 	//Enable LDOK to have PDB0_SC register changes loaded.
 
@@ -93,19 +96,22 @@ void initFTM(void)
 
 void initGPIO(void)
 {
-	//initialize push buttons and LEDs
+	// initialize push buttons and LEDs
 	LED_Init();
 	Button_Init();
 	uart_init();
-	//initialize clocks for each different port used.
 
-	//Configure Port Control Register for Inputs with pull enable and pull up resistor
+	// initialize clocks for each different port used.
+
+	// Configure Port Control Register for Inputs with pull enable and pull up resistor
 
 	// Configure mux for Outputs
 
 	// Switch the GPIO pins to output mode (Red and Blue LEDs)
-
+	GPIOB_PDDR |= (1 << 22);
+	GPIOB_PDDR |= (1 << 21);
 	// Turn off the LEDs
+	GPIOB_PSOR = (1UL << 21) | (1UL << 22);
 
 	// Set the push buttons as an input
 
@@ -142,14 +148,15 @@ void LED_Init(void)
 
 void Button_Init(void)
 {
-	// Enable clock for Port C PTC6 button
+	// Enable clock for Port C PTC6 and PTA4 button
 	SIM_SCGC5 |= SIM_SCGC5_PORTC_MASK;
+	SIM_SCGC5 |= SIM_SCGC5_PORTA_MASK;
 
 	// Configure the Mux for the button
 	PORTC_PCR6 = PORT_PCR_MUX(1);
+	PORTA_PCR4 = PORT_PCR_MUX(1);
 
 	// Set the push button as an input
 	GPIOC_PDDR = (0 << 6);
-
-	// TODO: Add SW3 init
+	GPIOA_PDDR = (0 << 4);
 }
