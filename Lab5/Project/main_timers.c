@@ -73,23 +73,29 @@ void initPDB(void)
 void initFTM(void)
 {
 	//Enable clock for FTM module (use FTM0)
+	SIM_SCGC6 |= SIM_SCGC6_FTM0_MASK;
 
 	//turn off FTM Mode to  write protection;
+	FTM0_MODE |= FTM_MODE_WPDIS_MASK;
 
 	//divide the input clock down by 128,
+	FTM0_SC |= (FTM_SC_PS_MASK & 7);
 
 	//reset the counter to zero
+	FTM0_CNT = 0;
 
 	//Set the overflow rate
 	//(Sysclock/128)- clock after prescaler
 	//(Sysclock/128)/1000- slow down by a factor of 1000 to go from
 	//Mhz to Khz, then 1/KHz = msec
 	//Every 1msec, the FTM counter will set the overflow flag (TOF) and
-	FTM0->MOD = (DEFAULT_SYSTEM_CLOCK / (1 << 7)) / 1000;
+	FTM0->MOD = (DEFAULT_SYSTEM_CLOCK/(1 << 7)) / 1000;
 
 	//Select the System Clock
+	FTM0_SC |= (FTM_SC_CLKS_MASK & (1 << 3);
 
 	//Enable the interrupt mask. Timer overflow Interrupt enable
+	FTM0_SC |= (FTM0_SC_TOIE_MASK & (1 << 6);
 
 	return;
 }
@@ -126,6 +132,7 @@ void initInterrupts(void)
 {
 	/*Can find these in MK64F12.h*/
 	// Enable NVIC for portA,portC, PDB0,FTM0
+	NVIC_EnableIRQ(FTM0_IRQn);
 
 	return;
 }
