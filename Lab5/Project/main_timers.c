@@ -50,7 +50,6 @@ void initPDB(void)
 {
 	//Enable clock for PDB module
 	SIM_SCGC6 = SIM_SCGC6_PDB_MASK;
-	SIM_SCGC5 |= SIM_SCGC5_PORTC_MASK;
 
 	// Set continuous mode, prescaler of 128, multiplication factor of 20,
 	// software triggering, and PDB enabled
@@ -59,7 +58,7 @@ void initPDB(void)
 	//Set the mod field to get a 1 second period.
 	//There is a division by 2 to make the LED blinking period 1 second.
 	//This translates to two mod counts in one second (one for on, one for off)
-	PDB0_MOD = 50000; // TODO: not right
+	PDB0_MOD = (DEFAULT_SYSTEM_CLOCK/((1 << 7)* 20)); //TODO: fix
 
 	//Configure the Interrupt Delay register.
 	PDB0_IDLY = 10;
@@ -68,7 +67,7 @@ void initPDB(void)
 	NVIC_EnableIRQ(PDB0_IRQn);
 
 	//Enable LDOK to have PDB0_SC register changes loaded.
-
+	PDB0_SC |= PDB_SC_LDOK_MASK;
 	return;
 }
 

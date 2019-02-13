@@ -1,6 +1,5 @@
 Enable the clock for the PDB0 module
-    SIM_SCGC6 = SIM_SCGC6_PDB_MASK;
-    SIM_SCGC5 |= SIM_SCGC5_PORTC_MASK;
+    SIM_SCGC6 |= SIM_SCGC6_PDB_MASK;
 
 Enable the PDB0 IRQ, use NVICEnableIRQ macro
     NVIC_EnableIRQ(PDB0_IRQn);
@@ -9,7 +8,7 @@ Enable the clock for the FTM0 module
 	SIM_SCGC6 |= SIM_SCGC6_FTM0_MASK;
 
 Enable the FTM0 IRQ, use NVICEnableIRQ macro
-	NVIC_EnableIRQ(ADC1_IRQn);
+	NVIC_EnableIRQ(FTM0_IRQn);
 
 Configure SW3 to be interrupted on the rising edge
 	PORTA_PCR4 |= PORT_PCR_IRQC(0x9);
