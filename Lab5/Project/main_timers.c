@@ -53,18 +53,23 @@ void initPDB(void)
 
 	// Set continuous mode, prescaler of 128, multiplication factor of 20,
 	// software triggering, and PDB enabled
-	PDB0_SC |= PDB_SC_CONT_MASK | PDB_SC_PRESCALER(7) | PDB_SC_MULT(3) | PDB_SC_TRGSEL(15) | PDB_SC_PDBEN_MASK;
+	PDB0_SC |= PDB_SC_CONT_MASK |
+		PDB_SC_PRESCALER(7) |
+		PDB_SC_MULT(2) |
+		PDB_SC_TRGSEL(15) |
+		PDB_SC_PDBEN_MASK |
+		PDB_SC_PDBIE_MASK;
 	
 	//Set the mod field to get a 1 second period.
 	//There is a division by 2 to make the LED blinking period 1 second.
 	//This translates to two mod counts in one second (one for on, one for off)
-	PDB0_MOD = (DEFAULT_SYSTEM_CLOCK/((1 << 7)* 20))/2; //TODO: should be right maybe
+	PDB0_MOD = ((DEFAULT_SYSTEM_CLOCK * 30)/(1 << 7) / 1000); //TODO: should be right maybe
 
 	//Configure the Interrupt Delay register.
 	PDB0_IDLY = 10;
 
 	//Enable the interrupt mask.
-	NVIC_EnableIRQ(PDB0_IRQn);
+	// NVIC_EnableIRQ(PDB0_IRQn);
 
 	//Enable LDOK to have PDB0_SC register changes loaded.
 	PDB0_SC |= PDB_SC_LDOK_MASK;
@@ -80,7 +85,7 @@ void initFTM(void)
 	FTM0_MODE |= FTM_MODE_WPDIS_MASK;
 
 	//divide the input clock down by 128,
-	FTM0_SC |= (FTM_SC_PS_MASK & 7);
+	FTM0_SC |= FTM_SC_PS(7);
 
 	//reset the counter to zero
 	FTM0_CNT = 0;
@@ -93,7 +98,7 @@ void initFTM(void)
 	FTM0_MOD = (DEFAULT_SYSTEM_CLOCK/(1 << 7)) / 1000;
 
 	//Select the System Clock
-	FTM0_SC |= (FTM_SC_CLKS_MASK & (1 << 3));
+	FTM0_SC |= FTM_SC_CLKS(1);
 
 	//Enable the interrupt mask. Timer overflow Interrupt enable
 	FTM0_SC |= (FTM_SC_TOIE_MASK & (1 << 6));
@@ -123,11 +128,11 @@ void initGPIO(void)
 	GPIOB_PDDR |= (1 << 21);
 
 	// Turn off the LEDs
-	GPIOB_PSOR = (1UL << 21) | (1UL << 22); */
+	GPIOB_PSOR = (1UL << 21) | (1UL << 22); 
 
 	// Set the push buttons as an input
 	GPIOC_PDDR = (0 << 6);
-	GPIOA_PDDR = (0 << 4);
+	GPIOA_PDDR = (0 << 4); */
 
 	// interrupt configuration for SW3(Rising Edge) and SW2 (Either)
 	// SW2 (Either)
@@ -142,7 +147,11 @@ void initInterrupts(void)
 {
 	/*Can find these in MK64F12.h*/
 	// Enable NVIC for portA,portC, PDB0,FTM0
+	NVIC_EnableIRQ(PDB0_IRQn);
 	NVIC_EnableIRQ(FTM0_IRQn);
+	NVIC_EnableIRQ(PORTA_IRQn);
+	NVIC_EnableIRQ(PORTC_IRQn);
+
 
 	return;
 }

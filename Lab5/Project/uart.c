@@ -85,9 +85,9 @@ void uart_putchar(char ch)
     UART0_D = ch;
 }
 
-void put(char *ptr_str){
-	/*use putchar to print string*/
-     uart_putchar(*ptr_str);
-        
+void put(char *ptr_str)
+{
+	while(*ptr_str)
+		uart_putchar(*ptr_str++);
 }
 
