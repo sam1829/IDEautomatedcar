@@ -19,10 +19,8 @@ void PDB0_IRQHandler(void){ //For PDB timer
 	PDB0_SC &= ~PDB_SC_PDBIF_MASK;
 	if(timerActive) {
 		GPIOB_PTOR |= (1 << 22);
-		GPIOB_PTOR |= (1 << 21);
 	} else {
-		GPIOB_PSOR = (1UL << 21) | (1UL << 22);
-		GPIOE_PSOR = 1UL << 26;
+		GPIOB_PSOR = (1UL << 22);
 	}
 	
 
@@ -32,7 +30,7 @@ void PDB0_IRQHandler(void){ //For PDB timer
 void FTM0_IRQHandler(void){ //For FTM timer
 	
 	//clear interrupt in register FTM0_SC
-	FTM0_SC = ~FTM_SC_TOF_MASK;
+	FTM0_SC &= ~FTM_SC_TOF_MASK;
 	//increment if button2 pressed
 	if(buttonPressed){
 		milliCount++;
@@ -63,7 +61,7 @@ void PORTC_IRQHandler(void){ //For switch 2
 	//reset interrupt
 	PORTC_PCR6 |= PORT_PCR_ISF_MASK;
 
-	if((GPIOC_PDIR & (1<<6)) == 0){
+	if(!buttonPressed){
 		buttonPressed = 1;
 		
 		// reset flextimer

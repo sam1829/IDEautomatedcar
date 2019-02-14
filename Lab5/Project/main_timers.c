@@ -114,26 +114,6 @@ void initGPIO(void)
 	Button_Init();
 	uart_init();
 
-	/* // initialize clocks for each different port used.
-	SIM_SCGC5 |= SIM_SCGC5_PORTC_MASK;
-	SIM_SCGC5 |= SIM_SCGC5_PORTA_MASK;
-
-	// Configure Port Control Register for Inputs with pull enable and pull up resistor
-	// Configure mux for Outputs
-	PORTC_PCR6  = PORT_PCR_MUX(1);
-	PORTA_PCR4  = PORT_PCR_MUX(1);
-
-	// Switch the GPIO pins to output mode (Red and Blue LEDs)
-	GPIOB_PDDR |= (1 << 22);
-	GPIOB_PDDR |= (1 << 21);
-
-	// Turn off the LEDs
-	GPIOB_PSOR = (1UL << 21) | (1UL << 22); 
-
-	// Set the push buttons as an input
-	GPIOC_PDDR = (0 << 6);
-	GPIOA_PDDR = (0 << 4); */
-
 	// interrupt configuration for SW3(Rising Edge) and SW2 (Either)
 	// SW2 (Either)
 	PORTC_PCR6 |= PORT_PCR_IRQC(0xB);
