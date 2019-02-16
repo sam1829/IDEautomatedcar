@@ -66,7 +66,6 @@ void ADC1_IRQHandler(void)
     unsigned short i = ADC1_RA >> 4;
 
     //Set DAC output value (12bit)
-    // TODO: (Insert your code here.)
     DAC0_DAT0H = i >> 8;
     DAC0_DAT0L = i;
 }
@@ -85,7 +84,7 @@ int main(void)
     char str[100];
 
     // Enable UART Pins
-    //TODO: (Insert your code here.)
+    //TODO: Doesn't uart init do this?
 
     // Initialize UART
     uart_init();
