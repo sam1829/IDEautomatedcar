@@ -54,16 +54,16 @@ void initPDB(void)
 	// Set continuous mode, prescaler of 128, multiplication factor of 20,
 	// software triggering, and PDB enabled
 	PDB0_SC |= PDB_SC_CONT_MASK |
-		PDB_SC_PRESCALER(7) |
-		PDB_SC_MULT(2) |
-		PDB_SC_TRGSEL(15) |
-		PDB_SC_PDBEN_MASK |
-		PDB_SC_PDBIE_MASK;
-	
+			   PDB_SC_PRESCALER(7) |
+			   PDB_SC_MULT(2) |
+			   PDB_SC_TRGSEL(15) |
+			   PDB_SC_PDBEN_MASK |
+			   PDB_SC_PDBIE_MASK;
+
 	//Set the mod field to get a 1 second period.
 	//There is a division by 2 to make the LED blinking period 1 second.
 	//This translates to two mod counts in one second (one for on, one for off)
-	PDB0_MOD = ((DEFAULT_SYSTEM_CLOCK * 30)/(1 << 7) / 1000); //TODO: should be right maybe
+	PDB0_MOD = ((DEFAULT_SYSTEM_CLOCK * 30) / (1 << 7) / 1000);
 
 	//Configure the Interrupt Delay register.
 	PDB0_IDLY = 10;
@@ -95,7 +95,7 @@ void initFTM(void)
 	//(Sysclock/128)/1000- slow down by a factor of 1000 to go from
 	//Mhz to Khz, then 1/KHz = msec
 	//Every 1msec, the FTM counter will set the overflow flag (TOF) and
-	FTM0_MOD = (DEFAULT_SYSTEM_CLOCK/(1 << 7)) / 1000;
+	FTM0_MOD = (DEFAULT_SYSTEM_CLOCK / (1 << 7)) / 1000;
 
 	//Select the System Clock
 	FTM0_SC |= FTM_SC_CLKS(1);
@@ -132,7 +132,6 @@ void initInterrupts(void)
 	NVIC_EnableIRQ(PORTA_IRQn);
 	NVIC_EnableIRQ(PORTC_IRQn);
 
-
 	return;
 }
 
@@ -146,12 +145,12 @@ void LED_Init(void)
 	PORTB_PCR21 |= PORT_PCR_MUX(1);
 	PORTB_PCR22 |= PORT_PCR_MUX(1);
 	PORTE_PCR26 |= PORT_PCR_MUX(1);
-	
+
 	// Switch the GPIO pins to output mode
 	GPIOB_PDDR |= (1 << 22);
 	GPIOE_PDDR |= (1 << 26);
 	GPIOB_PDDR |= (1 << 21);
-	
+
 	// Turn off the LEDs
 	GPIOB_PSOR = (1UL << 21) | (1UL << 22);
 	GPIOE_PSOR = 1UL << 26;
