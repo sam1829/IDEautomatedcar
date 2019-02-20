@@ -53,8 +53,10 @@ void ADC1_INIT(void)
 
     // Configure SC1A register.
     // Select ADC Channel and enable interrupts. Use ADC1 channel DADP3  in single ended mode.
-    ADC1_SC1A |= ADC_SC1_ADCH(3) | ADC_SC1_AIEN_MASK;
-
+    ADC1_SC1A |= ADC_SC1_AIEN_MASK;
+		ADC1_SC1A &= ~ADC_SC1_ADCH_MASK;
+		ADC1_SC1A |= 0x3 << ADC_SC1_ADCH_SHIFT;
+		
     // Enable NVIC interrupt
     NVIC_EnableIRQ(ADC1_IRQn);
 }
@@ -99,6 +101,12 @@ int main(void)
     for (;;)
     {
         sprintf(str, "\n Decimal: %d Hexadecimal: %x \n\r", ADC1_RA, ADC1_RA);
+        put(str);
+				int voltage = (int)(ADC1_RA*(3300.0/(0xffff)));
+			  sprintf(str, "\n Voltage mV: %d \n\r", voltage);
+				put(str);
+				int celsius = (voltage - 500) * 0.1;
+			  sprintf(str, "\n Temp F: %d Temp C: %d \n\r", (int)(celsius * (9.0/5.0) + 32.0), celsius);
         put(str);
         for (i = 0; i < 5000000; ++i)
         {
