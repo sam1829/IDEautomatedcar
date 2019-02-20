@@ -101,7 +101,7 @@ void initFTM(void)
 	FTM0_SC |= FTM_SC_CLKS(1);
 
 	//Enable the interrupt mask. Timer overflow Interrupt enable
-	FTM0_SC |= (FTM_SC_TOIE_MASK & (1 << 6));
+	FTM0_SC |= (FTM_SC_TOIE_MASK & FTM_SC_TOIE_SHIFT);
 
 	return;
 }
