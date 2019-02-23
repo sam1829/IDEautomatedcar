@@ -54,8 +54,9 @@ void ADC1_INIT(void)
     // Configure SC1A register.
     // Select ADC Channel and enable interrupts. Use ADC1 channel DADP3  in single ended mode.
     ADC1_SC1A |= ADC_SC1_AIEN_MASK;
-		ADC1_SC1A &= ~ADC_SC1_ADCH_MASK;
-		ADC1_SC1A |= 0x3 << ADC_SC1_ADCH_SHIFT;
+    ADC1_SC1A &= ~ADC_SC1_ADCH_MASK;
+    ADC1_SC1A |= 0x3 << ADC_SC1_ADCH_SHIFT;
+    ADC0_SC1A |= ADC_SC1_DIFF_MASK;
 		
     // Enable NVIC interrupt
     NVIC_EnableIRQ(ADC1_IRQn);
