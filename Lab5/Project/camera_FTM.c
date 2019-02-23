@@ -123,7 +123,7 @@ void FTM2_IRQHandler(void)
 	FTM2_SC &= ~FTM_SC_TOF_MASK;
 
 	// Toggle clk
-	GPIOB_PTOR |= (1 << 9); //TODO: fix maybe?
+	GPIOB_PTOR |= (1 << 9);
 	clkval = !clkval;
 
 	// Line capture logic
@@ -213,11 +213,11 @@ void init_FTM2()
 	FTM2_MOD = (DEFAULT_SYSTEM_CLOCK) / 205;
 
 	// 50% duty
-	//FTM2_C0V |= 0xFFFF / 2; TODO: which?
-	FTM2_C0V = 50;
+	FTM2_C0V = 100;
 
 	// Set edge-aligned mode
 	FTM2_C0SC |= FTM_CnSC_MSB_MASK;
+	FTM2_C0SC |= FTM_CnSC_MSA_MASK;
 	// Enable High-true pulses
 	// ELSB = 1, ELSA = 0
 	FTM2_C0SC |= FTM_CnSC_ELSB_MASK;
