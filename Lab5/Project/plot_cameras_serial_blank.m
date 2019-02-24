@@ -82,7 +82,7 @@ plot(trace);
 smoothtrace = trace;
 for i = 2:127
     %5-point Averager
-    %INSERT CODE
+    smoothtrace(i) = (smoothtrace(i-2) + smoothtrace(i-1) + smoothtrace(i) + smoothtrace(i+1) + smoothtrace(i+2))/5;
 end
 subplot(4,2,cam+2);
 %figure(smoothhand);
@@ -93,12 +93,16 @@ plot(smoothtrace);
 maxval = max(smoothtrace);
 for i = 1:128
     %Edge detection (binary 0 or 1)
-    %INSERT CODE
+    if (maxval(i)) > 8000)
+		maxval(i) = 1;
+	else
+		maxval(i) = 0;
+	end
 end
 drawnow;
 subplot(4,2,cam+4);
 %figure(binfighand);
-plot(q);
+plot(maxval);
 
 end %function
 
