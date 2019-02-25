@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Freescale Cup linescan camera code
  *
  *	This method of capturing data from the line
@@ -56,7 +56,7 @@ uint16_t line[128];
 
 // These variables are for streaming the camera
 //	 data over UART
-int debugcamdata = 0;
+int debugcamdata = 1;
 int capcnt = 0;
 char str[100];
 
@@ -185,7 +185,7 @@ void PIT0_IRQHandler(void)
 	FTM2_MOD = 100;
 
 	// Enable FTM2 interrupts (camera)
-	FTM0_SC |= FTM_SC_TOIE_MASK;
+	FTM2_SC |= FTM_SC_TOIE_MASK;
 
 	return;
 }
@@ -210,7 +210,7 @@ void init_FTM2()
 	FTM2_CNTIN = 0;
 
 	// Set the period (~10us)
-	FTM2_MOD = (DEFAULT_SYSTEM_CLOCK) / 205;
+	FTM2_MOD = 200;
 
 	// 50% duty
 	FTM2_C0V = 100;
@@ -227,7 +227,7 @@ void init_FTM2()
 	FTM2_EXTTRIG |= FTM_EXTTRIG_INITTRIGEN_MASK;
 
 	// Don't enable interrupts yet (disable)
-	FTM0_SC &= ~(FTM_SC_TOIE_MASK);
+	FTM2_SC &= ~(FTM_SC_TOIE_MASK);
 
 	// No prescalar, system clock
 	FTM2_SC |= FTM_SC_PS(0) | FTM_SC_CLKS(1);
@@ -246,7 +246,7 @@ void init_PIT(void)
 	// Setup periodic interrupt timer (PIT)
 	SIM_SCGC6 |= SIM_SCGC6_PIT_MASK;
 	// Enable clock for timers
-	SIM_SCGC6 |= SIM_SCGC6_PIT_MASK;
+	PIT_MCR &= ~PIT_MCR_MDIS_MASK;
 
 	// Enable timers to continue in debug mode
 	PIT_MCR &= ~PIT_MCR_FRZ_MASK; // In case you need to debug
@@ -299,7 +299,7 @@ void init_ADC0(void)
 	SIM_SCGC6 |= SIM_SCGC6_ADC0_MASK;
 
 	// Single ended 16 bit conversion, no clock divider
-	ADC0_CFG1 = ADC_CFG1_ADIV(0) | ADC_CFG1_MODE(3);
+	ADC0_CFG1 |= ADC_CFG1_ADIV(0) | ADC_CFG1_MODE(3);
 
 	// Do ADC Calibration for Singled Ended ADC. Do not touch.
 	ADC0_SC3 = ADC_SC3_CAL_MASK;
@@ -319,6 +319,9 @@ void init_ADC0(void)
 	ADC0_SC2 |= ADC_SC2_ADTRG_MASK;
 
 	// Set to single ended mode
+  ADC0_SC1A = 0;
+  ADC0_SC1A |= ADC_SC1_AIEN_MASK;
+  ADC0_SC1A |= ADC_SC1_ADCH(1);
 	ADC0_SC1A &= ~ADC_SC1_DIFF_MASK;
 
 	// Set up FTM2 trigger on ADC0
@@ -330,7 +333,7 @@ void init_ADC0(void)
 	SIM_SOPT7 &= ~SIM_SOPT7_ADC0PRETRGSEL_MASK;
 
 	// Enable NVIC interrupt
-	NVIC_EnableIRQ(ADC0_IRQHandler);
+	NVIC_EnableIRQ(ADC0_IRQn);
 }
 void LED_Init(void)
 {

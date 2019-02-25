@@ -19,10 +19,10 @@
 function plot_cameras_serial_blank 
 
 %Send over bluetooth or serial
-serialPort = 'COM3';
+serialPort = 'COM52';
 serialObject = serial(serialPort);
 %configure serial connection
-serialObject.BaudRate = 115200; %(Default)
+serialObject.BaudRate = 9600; %(Default)
 %serialObject.BaudRate = 115200;
 %serialObject.FlowControl = 'software';
 
@@ -80,7 +80,7 @@ plot(trace);
 
 %SMOOTH AND PLOT
 smoothtrace = trace;
-for i = 2:127
+for i = 3:126
     %5-point Averager
     smoothtrace(i) = (smoothtrace(i-2) + smoothtrace(i-1) + smoothtrace(i) + smoothtrace(i+1) + smoothtrace(i+2))/5;
 end
@@ -90,14 +90,14 @@ plot(smoothtrace);
 
 %THRESHOLD
 %calculate 1's and 0's via thresholding
-maxval = max(smoothtrace);
+maxval = smoothtrace;
 for i = 1:128
     %Edge detection (binary 0 or 1)
-    if (maxval(i)) > 8000)
-		maxval(i) = 1;
-	else
-		maxval(i) = 0;
-	end
+    if (maxval(i) > 800)
+        maxval(i) = 1;
+    else
+        maxval(i) = 0;
+    end
 end
 drawnow;
 subplot(4,2,cam+4);
