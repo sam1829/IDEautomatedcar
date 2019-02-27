@@ -9,7 +9,7 @@
 
 #include "MK64F12.h"
 #include "uart.h"
-#include "PWM.h"
+#include "pwm.h"
 
 void initialize();
 void en_interrupts();
