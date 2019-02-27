@@ -89,7 +89,7 @@ void InitPWM()
 	//| FTM_SC_TOIE_MASK;
 
 	// Enable Interrupt Vector for FTM
-    //NVIC_EnableIRQ(FTM0_IRQn);
+  NVIC_EnableIRQ(FTM0_IRQn);
 
 }
 

@@ -26,7 +26,7 @@ int main(void)
 	//Step 3
 	//Generate 20% duty cycle at 10kHz
 	for(;;) ;  //then loop forever
-	
+		SetDutyCycle(20, 10e3, 1);
 	//Step 9
 	for(;;)  //loop forever
 	{
