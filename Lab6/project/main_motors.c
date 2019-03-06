@@ -23,11 +23,30 @@ int main(void)
 	// Print welcome over serial
 	put("Running... \n\r");
 	
+	int forward = 1;
+	int phase = 0;
+	while(1){
+		// Turn  off  all coils , Set  GPIO  pins to 0
+		//Set  one  pin  high at a time
+		if(forward ){
+			if(phase == 0){/*turn on coil A*/; phase ++;} //A, 1a
+			else if(phase  == 1){ /*turn on coil B*/; phase ++;} //B,2a
+			else if (phase  == 2) { /*turn on coil C*/; phase ++;} //C,1b
+			else { /*turn on coil D*/; phase =0;} //D,2b
+		}else    {// reverse
+			if (phase == 0) { /*turn on coil D*/; phase ++;} //D,2b
+			else if (phase  == 1) { /*turn on coil C*/; phase ++;} //C,1b
+			else if (phase  == 2) { /*turn on coil B*/; phase ++;} //B,2a
+			else { /*turn on coil A*/; phase =0;} //A,1a
+		}
+	//Note - you  need to  write  your  own  delay  function
+		delay (10);   // smaller  values=faster  speed}
+	
 	//Step 3
 	//Generate 20% duty cycle at 10kHz
-	for(;;){  //then loop forever
-		SetDutyCycle(20, 10e3, 1);
-	}
+	//for(;;){  //then loop forever
+	//	SetDutyCycle(70, 10e3, 0);
+	//}
 	//Step 9
 	for(;;)  //loop forever
 	{
@@ -39,25 +58,25 @@ int main(void)
 		
 		// 0 to 100% duty cycle in forward direction
 		for (i=0; i<100; i++){
-			
+			SetDutyCycle(i, 10e3, 0);
 			delay(10);
 		}
 		
 		// 100% down to 0% duty cycle in the forward direction
 		for (i=100; i>=0; i--){
-			
+			SetDutyCycle(i, 10e3, 0);
 			delay(10);
 		}
 		
 		// 0 to 100% duty cycle in reverse direction
 		for (i=0; i<100; i++){
-			
+			SetDutyCycle(i, 10e3, 1);
 			delay(10);
 		}
 		
 		// 100% down to 0% duty cycle in the reverse direction
 		for (i=100; i>=0; i--){
-			
+			SetDutyCycle(i, 10e3, 1);
 			delay(10);
 		}
 
