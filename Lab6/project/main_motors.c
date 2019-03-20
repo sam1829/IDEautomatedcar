@@ -36,7 +36,7 @@ int main(void)
 	// Configure the GPIO Pins for Output
 	GPIOD_PDDR = (1 << 0) | (1 << 1) | (1 << 2) | (1 << 3);
 
-	int forward = 1;
+	int forward = 0;
 	int phase = 0;
 	while(1){
 		// Turn  off  all coils , Set  GPIO  pins to 0
@@ -54,7 +54,7 @@ int main(void)
 			else { GPIOD_PSOR = (1 << 0); phase =0;} //A,1a
 		}
 	//Note - you  need to  write  your  own  delay  function
-		delay (10);   // smaller  values=faster  speed}
+		delay (5);   // smaller  values=faster  speed}
 }
 	//Step 3
 	//Generate 20% duty cycle at 10kHz
@@ -72,25 +72,25 @@ int main(void)
 
 		// 0 to 100% duty cycle in forward direction
 		for (i=0; i<100; i++){
-			SetDutyCycle(i, 10e3, 0);
+			SetDutyCycle0(i, freq, 0);
 			delay(10);
 		}
 
 		// 100% down to 0% duty cycle in the forward direction
 		for (i=100; i>=0; i--){
-			SetDutyCycle(i, 10e3, 0);
+			SetDutyCycle0(i, freq, 0);
 			delay(10);
 		}
 
 		// 0 to 100% duty cycle in reverse direction
 		for (i=0; i<100; i++){
-			SetDutyCycle(i, 10e3, 1);
+			SetDutyCycle0(i, freq, 1);
 			delay(10);
 		}
 
 		// 100% down to 0% duty cycle in the reverse direction
 		for (i=100; i>=0; i--){
-			SetDutyCycle(i, 10e3, 1);
+			SetDutyCycle0(i, freq, 1);
 			delay(10);
 		}
 
@@ -117,5 +117,5 @@ void initialize()
 	uart_init();
 
 	// Initialize the FlexTimer
-	InitPWM();
+	InitPWM0();
 }
