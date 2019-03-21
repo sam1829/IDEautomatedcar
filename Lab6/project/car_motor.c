@@ -23,10 +23,10 @@ int main(void)
 	put("Running... \n\r");
 
 	while(1){
-    //DC Motor
-		SetDutyCycle0(50, 10e3, 0);
-    //Servo motor
-    SetDutyCycle3(20, 50);
+		//DC Motor
+		SetDutyCycle0(20, 10e3, 1);
+		//Servo motor
+		SetDutyCycle3(20, 50);
 	}
 }
 
