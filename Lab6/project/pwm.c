@@ -31,12 +31,18 @@ void SetDutyCycle0(unsigned int DutyCycle, unsigned int Frequency, int dir)
 {
 	// Calculate the new cutoff value
 	uint16_t mod = (uint16_t) (((CLOCK/Frequency) * DutyCycle) / 100);
-
+	
 	// Set outputs
 	if(dir==1)
-    {FTM0_C3V = mod; FTM0_C2V=0;}
+    {
+			FTM0_C3V = mod; FTM0_C2V=0;
+			FTM0_C1V = mod; FTM0_C0V=0;
+		}
   else
-    {FTM0_C2V = mod; FTM0_C3V=0;}
+    {
+			FTM0_C2V = mod; FTM0_C3V=0;
+			FTM0_C0V = mod; FTM0_C1V=0;
+		}
 
 	// Update the clock to the new frequency
 	FTM0_MOD = (CLOCK/Frequency);
@@ -56,9 +62,11 @@ void InitPWM0()
 	// 11.4.1 Route the output of FTM channel 0 to the pins
 	// Use drive strength enable flag to high drive strength
 	//These port/pins may need to be updated for the K64 <Yes, they do. Here are two that work.>
-
-    PORTC_PCR3  = PORT_PCR_MUX(4)  | PORT_PCR_DSE_MASK; //Ch2
-    PORTC_PCR4  = PORT_PCR_MUX(4)  | PORT_PCR_DSE_MASK;//Ch3
+	
+		PORTC_PCR1  = PORT_PCR_MUX(4) | PORT_PCR_DSE_MASK;
+		PORTC_PCR2  = PORT_PCR_MUX(4) | PORT_PCR_DSE_MASK;
+		PORTC_PCR3  = PORT_PCR_MUX(4) | PORT_PCR_DSE_MASK;
+		PORTC_PCR4  = PORT_PCR_MUX(4) | PORT_PCR_DSE_MASK;
 
 	// 39.3.10 Disable Write Protection
 	FTM0_MODE |= FTM_MODE_WPDIS_MASK;
@@ -79,10 +87,16 @@ void InitPWM0()
 	// See Table 39-67,  Edge-aligned PWM, High-true pulses (clear out on match)
 	FTM0_C3SC |= FTM_CnSC_MSB_MASK | FTM_CnSC_ELSB_MASK;
 	FTM0_C3SC &= ~FTM_CnSC_ELSA_MASK;
-
-	// See Table 39-67,  Edge-aligned PWM, Low-true pulses (clear out on match)
+	
 	FTM0_C2SC |= FTM_CnSC_MSB_MASK | FTM_CnSC_ELSB_MASK;
 	FTM0_C2SC &= ~FTM_CnSC_ELSA_MASK;
+	
+	FTM0_C1SC |= FTM_CnSC_MSB_MASK | FTM_CnSC_ELSB_MASK;
+	FTM0_C1SC &= ~FTM_CnSC_ELSA_MASK;
+
+	// See Table 39-67,  Edge-aligned PWM, Low-true pulses (clear out on match)
+	FTM0_C0SC |= FTM_CnSC_MSB_MASK | FTM_CnSC_ELSB_MASK;
+	FTM0_C0SC &= ~FTM_CnSC_ELSA_MASK;
 
 	// 39.3.3 FTM Setup
 	// Set prescale value to 1
@@ -91,8 +105,16 @@ void InitPWM0()
 	FTM0_SC = FTM_SC_PS(0) | FTM_SC_CLKS(1);
 	//| FTM_SC_TOIE_MASK;
 
+	PORTB_PCR3 |= PORT_PCR_MUX(1);
+	PORTB_PCR2 |= PORT_PCR_MUX(1);
+
 	// Enable Interrupt Vector for FTM
   //NVIC_EnableIRQ(FTM0_IRQn);
+	
+	GPIOB_PDDR |= (1<<2) | (1<<3);
+	GPIOB_PDOR |= 1<<2 | 1<<3;
+	
+	
 
 }
 
@@ -117,7 +139,7 @@ void SetDutyCycle3(unsigned int DutyCycle, unsigned int Frequency)
 	uint16_t mod = (uint16_t) (((CLOCK/128/Frequency) * DutyCycle) / 100);
 
 	// Set outputs
-  FTM3_C3V = mod;
+  FTM3_C4V = mod;
 
 	// Update the clock to the new frequency
 	FTM3_MOD = (CLOCK/128/Frequency);
@@ -132,13 +154,12 @@ void InitPWM3()
 	SIM_SCGC3 |= SIM_SCGC3_FTM3_MASK;
 
 	// Enable clock on PORT A so it can output
-	SIM_SCGC5 |= SIM_SCGC5_PORTD_MASK;
+	SIM_SCGC5 |= SIM_SCGC5_PORTC_MASK;
 
 	// 11.4.1 Route the output of FTM channel 0 to the pins
 	// Use drive strength enable flag to high drive strength
 	//These port/pins may need to be updated for the K64 <Yes, they do. Here are two that work.>
-
-  PORTD_PCR3  = PORT_PCR_MUX(4) | PORT_PCR_DSE_MASK;
+	PORTC_PCR8  = PORT_PCR_MUX(3) | PORT_PCR_DSE_MASK;
 
 	// 39.3.10 Disable Write Protection
 	FTM3_MODE |= FTM_MODE_WPDIS_MASK;
@@ -157,8 +178,8 @@ void InitPWM3()
 	// 39.3.6 Set the Status and Control of both channels
 	// Used to configure mode, edge and level selection
 	// See Table 39-67,  Edge-aligned PWM, High-true pulses (clear out on match)
-	FTM3_C3SC |= FTM_CnSC_MSB_MASK | FTM_CnSC_ELSB_MASK;
-	FTM3_C3SC &= ~FTM_CnSC_ELSA_MASK;
+	FTM3_C4SC |= FTM_CnSC_MSB_MASK | FTM_CnSC_ELSB_MASK;
+	FTM3_C4SC &= ~FTM_CnSC_ELSA_MASK;
 
 	// 39.3.3 FTM Setup
 	// Set prescale value to 1

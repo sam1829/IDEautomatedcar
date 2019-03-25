@@ -21,12 +21,14 @@ int main(void)
 
 	// Print welcome over serial
 	put("Running... \n\r");
-
+	int i =0;
 	while(1){
 		//DC Motor
-		SetDutyCycle0(20, 10e3, 1);
+		SetDutyCycle0(40, 10e3, 1);
 		//Servo motor
-		SetDutyCycle3(20, 50);
+		SetDutyCycle3(i, 50);
+		i++;
+		delay(100);
 	}
 }
 
