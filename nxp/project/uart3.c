@@ -32,8 +32,8 @@ SIM_SCGC4 |= SIM_SCGC4_UART3_MASK;
 SIM_SCGC5 |= SIM_SCGC5_PORTB_MASK;
  
 //Configure the port control register to alternative 3 (which is UART mode for K64)
-PORTB_PCR10 |= PORT_PCR_MUX(3);
-PORTB_PCR11 |= PORT_PCR_MUX(3);
+PORTB_PCR16 |= PORT_PCR_MUX(3);
+PORTB_PCR17 |= PORT_PCR_MUX(3);
 
 /*Configure the UART for establishing serial communication*/
 
