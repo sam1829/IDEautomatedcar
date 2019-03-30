@@ -13,24 +13,23 @@
 void initialize(void);
 void delay(int del);
 
+int capcnt = 0;
+
 int main(void)
 {
-	// Initialize UART and PWM
+	// Initialize everything
 	initialize();
 
 	// Print welcome over serial
-	put("Running... \n\r");
-	int i =0;
-	while(1){
-		//DC Motor
-		SetDutyCycle0(40, 10e3, 1);
-		//Servo motor
-		SetDutyCycle3(i, 50);
-		i++;
-		delay(100);
+	for(;;){
+    read_camera()
+
 	}
 }
 
+void convolve(uart_init input, output, length, h, h_length){
+
+}
 
 /**
  * Waits for a delay (in milliseconds)
@@ -49,7 +48,13 @@ void initialize()
 	// Initialize UART
 	uart_init();
 
-	// Initialize the FlexTimer
+	// Initialize the FlexTimer for motors
 	InitPWM0();
 	InitPWM3();
+
+  //camera
+  init_GPIO(); // For CLK and SI output on GPIO
+	init_FTM2(); // To generate CLK, SI, and trigger ADC
+	init_ADC0();
+	init_PIT(); // To trigger camera read based on integration time
 }

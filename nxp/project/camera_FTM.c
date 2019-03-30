@@ -6,11 +6,11 @@
  *	interrupt timer, an ADC, and some GPIOs.
  *	CLK and SI are driven with GPIO because the FTM2
  *	module used doesn't have any output pins on the
- * 	development board. The PIT timer is used to 
+ * 	development board. The PIT timer is used to
  *  control the integration period. When it overflows
  * 	it enables interrupts from the FTM2 module and then
  *	the FTM2 and ADC are active for 128 clock cycles to
- *	generate the camera signals and read the camera 
+ *	generate the camera signals and read the camera
  *  output.
  *
  *	PTB8			- camera CLK
@@ -44,6 +44,7 @@ void FTM2_IRQHandler(void);
 void PIT1_IRQHandler(void);
 void ADC0_IRQHandler(void);
 void LED_Init(void);
+void read_camera(void);
 
 // Pixel counter for camera logic
 // Starts at -2 so that the SI pulse occurs
@@ -56,50 +57,29 @@ uint16_t line[128];
 
 // These variables are for streaming the camera
 //	 data over UART
-int debugcamdata = 1;
+int debugcamdata = 0;
 int capcnt = 0;
 char str[100];
 
 // ADC0VAL holds the current ADC value
 uint16_t ADC0VAL;
 
-int main(void)
-{
-	int i;
+void read_camera(){
+	 line[127] = 0
 
-	uart_init();
-	init_GPIO(); // For CLK and SI output on GPIO
-	init_FTM2(); // To generate CLK, SI, and trigger ADC
-	init_ADC0();
-	init_PIT(); // To trigger camera read based on integration time
+	 //enable interrupts
+	 FTM2_SC |= FTM_SC_TOIE_MASK;
+	 PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK;
 
-	for (;;)
-	{
+	 while(line[127] == 0){
 
-		if (debugcamdata)
-		{
-			// Every 2 seconds
-			//if (capcnt >= (2/INTEGRATION_TIME)) {
-			if (capcnt >= (500))
-			{
-				GPIOB_PCOR |= (1 << 22);
-				// send the array over uart
-				sprintf(str, "%i\n\r", -1); // start value
-				put(str);
-				for (i = 0; i < 127; i++)
-				{
-					sprintf(str, "%i\n", line[i]);
-					put(str);
-				}
-				sprintf(str, "%i\n\r", -2); // end value
-				put(str);
-				capcnt = 0;
-				GPIOB_PSOR |= (1 << 22);
-			}
-		}
+	 }
 
-	} //for
-} //main
+	 //disable interrupts
+	 FTM2_SC &= ~FTM_SC_TOIE_MASK;
+	 PIT_TCTRL0 &= ~PIT_TCTRL_TIE_MASK;
+
+}
 
 /*�ADC0�Conversion�Complete�ISR� */
 void ADC0_IRQHandler(void)
@@ -109,7 +89,7 @@ void ADC0_IRQHandler(void)
 	ADC0VAL = ADC0_RA >> 4;
 }
 
-/* 
+/*
 * FTM2 handles the camera driving logic
 *	This ISR gets called once every integration period
 *		by the periodic interrupt timer 0 (PIT0)
@@ -166,8 +146,8 @@ void FTM2_IRQHandler(void)
 /* PIT0 determines the integration period
 *		When it overflows, it triggers the clock logic from
 *		FTM2. Note the requirement to set the MOD register
-* 	to reset the FTM counter because the FTM counter is 
-*		always counting, I am just enabling/disabling FTM2 
+* 	to reset the FTM counter because the FTM counter is
+*		always counting, I am just enabling/disabling FTM2
 *		interrupts to control when the line capture occurs
 */
 void PIT0_IRQHandler(void)
@@ -238,7 +218,7 @@ void init_FTM2()
 	return;
 }
 
-/* Initialization of PIT timer to control 
+/* Initialization of PIT timer to control
 * 		integration period
 */
 void init_PIT(void)
