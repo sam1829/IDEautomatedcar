@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Freescale Cup linescan camera code
  *
  *	This method of capturing data from the line
@@ -65,11 +65,11 @@ char str[100];
 uint16_t ADC0VAL;
 
 void read_camera(){
-	 line[127] = 0
+	 line[127] = 0;
 
 	 //enable interrupts
-	 FTM2_SC |= FTM_SC_TOIE_MASK;
-	 PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK;
+	 //FTM2_SC |= FTM_SC_TOIE_MASK;
+	 //PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK;
 
 	 while(line[127] == 0){
 
