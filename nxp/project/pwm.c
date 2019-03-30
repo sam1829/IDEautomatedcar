@@ -12,11 +12,11 @@
 
 /*From clock setup 0 in system_MK64f12.c*/
 #define DEFAULT_SYSTEM_CLOCK 20485760u /* Default System clock value */
-#define CLOCK					20485760u
-#define PWM_FREQUENCY0			10000
-#define FTM0_MOD_VALUE			(CLOCK/PWM_FREQUENCY0)
-#define PWM_FREQUENCY3			50
-#define FTM3_MOD_VALUE			(CLOCK/(1<<7)/PWM_FREQUENCY3)
+#define CLOCK 20485760u
+#define PWM_FREQUENCY0 10000
+#define FTM0_MOD_VALUE (CLOCK / PWM_FREQUENCY0)
+#define PWM_FREQUENCY3 50
+#define FTM3_MOD_VALUE (CLOCK / (1 << 7) / PWM_FREQUENCY3)
 
 static volatile unsigned int PWMTick0 = 0;
 static volatile unsigned int PWMTick3 = 0;
@@ -30,22 +30,26 @@ static volatile unsigned int PWMTick3 = 0;
 void SetDutyCycle0(unsigned int DutyCycle, unsigned int Frequency, int dir)
 {
 	// Calculate the new cutoff value
-	uint16_t mod = (uint16_t) (((CLOCK/Frequency) * DutyCycle) / 100);
-	
+	uint16_t mod = (uint16_t)(((CLOCK / Frequency) * DutyCycle) / 100);
+
 	// Set outputs
-	if(dir==1)
-    {
-			FTM0_C3V = mod; FTM0_C2V=0;
-			FTM0_C1V = mod; FTM0_C0V=0;
-		}
-  else
-    {
-			FTM0_C2V = mod; FTM0_C3V=0;
-			FTM0_C0V = mod; FTM0_C1V=0;
-		}
+	if (dir == 1)
+	{
+		FTM0_C3V = mod;
+		FTM0_C2V = 0;
+		FTM0_C1V = mod;
+		FTM0_C0V = 0;
+	}
+	else
+	{
+		FTM0_C2V = mod;
+		FTM0_C3V = 0;
+		FTM0_C0V = mod;
+		FTM0_C1V = 0;
+	}
 
 	// Update the clock to the new frequency
-	FTM0_MOD = (CLOCK/Frequency);
+	FTM0_MOD = (CLOCK / Frequency);
 }
 
 /*
@@ -62,11 +66,11 @@ void InitPWM0()
 	// 11.4.1 Route the output of FTM channel 0 to the pins
 	// Use drive strength enable flag to high drive strength
 	//These port/pins may need to be updated for the K64 <Yes, they do. Here are two that work.>
-	
-		PORTC_PCR1  = PORT_PCR_MUX(4) | PORT_PCR_DSE_MASK;
-		PORTC_PCR2  = PORT_PCR_MUX(4) | PORT_PCR_DSE_MASK;
-		PORTC_PCR3  = PORT_PCR_MUX(4) | PORT_PCR_DSE_MASK;
-		PORTC_PCR4  = PORT_PCR_MUX(4) | PORT_PCR_DSE_MASK;
+
+	PORTC_PCR1 = PORT_PCR_MUX(4) | PORT_PCR_DSE_MASK;
+	PORTC_PCR2 = PORT_PCR_MUX(4) | PORT_PCR_DSE_MASK;
+	PORTC_PCR3 = PORT_PCR_MUX(4) | PORT_PCR_DSE_MASK;
+	PORTC_PCR4 = PORT_PCR_MUX(4) | PORT_PCR_DSE_MASK;
 
 	// 39.3.10 Disable Write Protection
 	FTM0_MODE |= FTM_MODE_WPDIS_MASK;
@@ -87,10 +91,10 @@ void InitPWM0()
 	// See Table 39-67,  Edge-aligned PWM, High-true pulses (clear out on match)
 	FTM0_C3SC |= FTM_CnSC_MSB_MASK | FTM_CnSC_ELSB_MASK;
 	FTM0_C3SC &= ~FTM_CnSC_ELSA_MASK;
-	
+
 	FTM0_C2SC |= FTM_CnSC_MSB_MASK | FTM_CnSC_ELSB_MASK;
 	FTM0_C2SC &= ~FTM_CnSC_ELSA_MASK;
-	
+
 	FTM0_C1SC |= FTM_CnSC_MSB_MASK | FTM_CnSC_ELSB_MASK;
 	FTM0_C1SC &= ~FTM_CnSC_ELSA_MASK;
 
@@ -109,19 +113,17 @@ void InitPWM0()
 	PORTB_PCR2 |= PORT_PCR_MUX(1);
 
 	// Enable Interrupt Vector for FTM
-  //NVIC_EnableIRQ(FTM0_IRQn);
-	
-	GPIOB_PDDR |= (1<<2) | (1<<3);
-	GPIOB_PDOR |= 1<<2 | 1<<3;
-	
-	
+	//NVIC_EnableIRQ(FTM0_IRQn);
 
+	GPIOB_PDDR |= (1 << 2) | (1 << 3);
+	GPIOB_PDOR |= 1 << 2 | 1 << 3;
 }
 
 /*OK to remove this ISR?*/
-void FTM0_IRQHandler(void){ //For FTM timer
+void FTM0_IRQHandler(void)
+{ //For FTM timer
 
-  FTM0_SC &= ~FTM_SC_TOF_MASK;
+	FTM0_SC &= ~FTM_SC_TOF_MASK;
 
 	//if motor tick less than 255 count up...
 	if (PWMTick0 < 0xff)
@@ -136,13 +138,13 @@ void FTM0_IRQHandler(void){ //For FTM timer
 void SetDutyCycle3(unsigned int DutyCycle, unsigned int Frequency)
 {
 	// Calculate the new cutoff value
-	uint16_t mod = (uint16_t) (((CLOCK/128/Frequency) * DutyCycle) / 100);
+	uint16_t mod = (uint16_t)(((CLOCK / 128 / Frequency) * DutyCycle) / 100);
 
 	// Set outputs
-  FTM3_C4V = mod;
+	FTM3_C4V = mod;
 
 	// Update the clock to the new frequency
-	FTM3_MOD = (CLOCK/128/Frequency);
+	FTM3_MOD = (CLOCK / 128 / Frequency);
 }
 
 /*
@@ -159,7 +161,7 @@ void InitPWM3()
 	// 11.4.1 Route the output of FTM channel 0 to the pins
 	// Use drive strength enable flag to high drive strength
 	//These port/pins may need to be updated for the K64 <Yes, they do. Here are two that work.>
-	PORTC_PCR8  = PORT_PCR_MUX(3) | PORT_PCR_DSE_MASK;
+	PORTC_PCR8 = PORT_PCR_MUX(3) | PORT_PCR_DSE_MASK;
 
 	// 39.3.10 Disable Write Protection
 	FTM3_MODE |= FTM_MODE_WPDIS_MASK;
@@ -189,15 +191,14 @@ void InitPWM3()
 	//| FTM_SC_TOIE_MASK;
 
 	// Enable Interrupt Vector for FTM
-  //NVIC_EnableIRQ(FTM0_IRQn);
-
-
+	//NVIC_EnableIRQ(FTM0_IRQn);
 }
 
 /*OK to remove this ISR?*/
-void FTM3_IRQHandler(void){ //For FTM timer
+void FTM3_IRQHandler(void)
+{ //For FTM timer
 
-  FTM3_SC &= ~FTM_SC_TOF_MASK;
+	FTM3_SC &= ~FTM_SC_TOF_MASK;
 
 	//if motor tick less than 255 count up...
 	if (PWMTick3 < 0xff)

@@ -24,29 +24,16 @@ int main(void)
 {
 	// Initialize everything
 	initialize();
-	uint16_t * line;
+	uint16_t *line;
 
 	// Print welcome over serial
-	for(;;){
-    line = read_camera();
+	for (;;)
+	{
+		line = read_camera();
 		uint16_t output[128];
 		float conv = {1.0, 1.0, 1.0};
 		convolve(line, output, CAMERA_LENGTH, &conv, 3);
-	uart_putchar3('q');
-
-	// Print welcome over serial
-	/*for(;;){
-    read_camera()
-
-	}*/
-}
-// should uart_init type be a float* as well??
-void convolve(float* input, float* output, int length, float* h, int h_length){
-	for (int i = 0; i <= length - h_length; i++){
-		output[i] = 0.0;
-		for (int j = 0; j <= h_length; j++){
-			output[i] += input[i + j] * h[h_length - j - 1];
-		}
+		uart_putchar3('q');
 	}
 }
 
@@ -55,9 +42,11 @@ void convolve(float* input, float* output, int length, float* h, int h_length){
  *
  * del - The delay in milliseconds
  */
-void delay(int del){
+void delay(int del)
+{
 	int i;
-	for (i=0; i<del*50000; i++){
+	for (i = 0; i < del * 50000; i++)
+	{
 		// Do nothing
 	}
 }
@@ -71,7 +60,7 @@ void initialize()
 	// Initialize the FlexTimer for motors
 	InitPWM0();
 	InitPWM3();
-/*
+	/*
   //camera
   init_GPIO(); // For CLK and SI output on GPIO
 	init_FTM2(); // To generate CLK, SI, and trigger ADC
@@ -82,7 +71,6 @@ void initialize()
 
 void put3(char *ptr_str)
 {
-	while(*ptr_str)
+	while (*ptr_str)
 		uart_putchar3(*ptr_str++);
 }
-	

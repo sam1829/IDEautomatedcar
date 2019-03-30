@@ -44,7 +44,7 @@ void FTM2_IRQHandler(void);
 void PIT1_IRQHandler(void);
 void ADC0_IRQHandler(void);
 void LED_Init(void);
-uint16_t * read_camera(void);
+uint16_t *read_camera(void);
 
 // Pixel counter for camera logic
 // Starts at -2 so that the SI pulse occurs
@@ -64,23 +64,23 @@ char str[100];
 // ADC0VAL holds the current ADC value
 uint16_t ADC0VAL;
 
-uint16_t * read_camera(){
-	 line[127] = 0;
+uint16_t *read_camera()
+{
+	line[127] = 0;
 
-	 //enable interrupts
-	 //FTM2_SC |= FTM_SC_TOIE_MASK;
-	 //PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK;
+	//enable interrupts
+	//FTM2_SC |= FTM_SC_TOIE_MASK;
+	//PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK;
 
-	 while(line[127] == 0){
+	while (line[127] == 0)
+	{
+	}
 
-	 }
+	//disable interrupts
+	FTM2_SC &= ~FTM_SC_TOIE_MASK;
+	PIT_TCTRL0 &= ~PIT_TCTRL_TIE_MASK;
 
-	 //disable interrupts
-	 FTM2_SC &= ~FTM_SC_TOIE_MASK;
-	 PIT_TCTRL0 &= ~PIT_TCTRL_TIE_MASK;
-
-	 return *line;
-
+	return *line;
 }
 
 /*�ADC0�Conversion�Complete�ISR� */
@@ -301,9 +301,9 @@ void init_ADC0(void)
 	ADC0_SC2 |= ADC_SC2_ADTRG_MASK;
 
 	// Set to single ended mode
-  ADC0_SC1A = 0;
-  ADC0_SC1A |= ADC_SC1_AIEN_MASK;
-  ADC0_SC1A |= ADC_SC1_ADCH(1);
+	ADC0_SC1A = 0;
+	ADC0_SC1A |= ADC_SC1_AIEN_MASK;
+	ADC0_SC1A |= ADC_SC1_ADCH(1);
 	ADC0_SC1A &= ~ADC_SC1_DIFF_MASK;
 
 	// Set up FTM2 trigger on ADC0
