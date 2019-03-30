@@ -68,8 +68,8 @@ uint16_t * read_camera(){
 	 line[127] = 0;
 
 	 //enable interrupts
-	 FTM2_SC |= FTM_SC_TOIE_MASK;
-	 PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK;
+	 //FTM2_SC |= FTM_SC_TOIE_MASK;
+	 //PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK;
 
 	 while(line[127] == 0){
 

@@ -22,6 +22,11 @@ void uart_init3(void);
 uint8_t uart_getchar3(void);
 void uart_putchar3(char ch);
 
+void uart_put(char *ptr_str);
+void uart_init(void);
+uint8_t uart_getchar(void);
+void uart_putchar(char ch);
+
 void uart_init3()
 {
 //define variables for baud rate and baud rate fine adjust
@@ -32,8 +37,8 @@ SIM_SCGC4 |= SIM_SCGC4_UART3_MASK;
 SIM_SCGC5 |= SIM_SCGC5_PORTB_MASK;
  
 //Configure the port control register to alternative 3 (which is UART mode for K64)
-PORTB_PCR16 |= PORT_PCR_MUX(3);
-PORTB_PCR17 |= PORT_PCR_MUX(3);
+PORTB_PCR10 |= PORT_PCR_MUX(3);
+PORTB_PCR11 |= PORT_PCR_MUX(3);
 
 /*Configure the UART for establishing serial communication*/
 
