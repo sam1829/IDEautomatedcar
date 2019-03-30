@@ -9,7 +9,9 @@
 #include "MK64F12.h"
 #include "uart.h"
 #include "pwm.h"
+#include "filter.c"
 
+#define CAMERA_LENGTH 128
 void initialize(void);
 void delay(int del);
 
@@ -19,23 +21,18 @@ int main(void)
 {
 	// Initialize everything
 	initialize();
+	uint16_t * line;
 
 	// Print welcome over serial
 	for(;;){
-    read_camera()
+    line = read_camera();
+		uint16_t output[128];
+		float conv = {1.0, 1.0, 1.0};
+		convolve(line, output, CAMERA_LENGTH, &conv, 3);
 
 	}
 }
 
-// should uart_init type be a float* as well??
-void convolve(uart_init input, float* output, int length, float* h, int h_length){
-	for (int i = 0; i <= length - h_length; i++){
-		output[i] = 0.0;
-		for (int j = 0; j <= h_length; j++){
-			output[i] += input[i + j] * h[h_length - j - 1];
-		}
-	}
-}
 
 /**
  * Waits for a delay (in milliseconds)

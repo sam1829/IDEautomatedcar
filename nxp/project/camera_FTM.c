@@ -44,7 +44,7 @@ void FTM2_IRQHandler(void);
 void PIT1_IRQHandler(void);
 void ADC0_IRQHandler(void);
 void LED_Init(void);
-void read_camera(void);
+uint16_t * read_camera(void);
 
 // Pixel counter for camera logic
 // Starts at -2 so that the SI pulse occurs
@@ -64,8 +64,8 @@ char str[100];
 // ADC0VAL holds the current ADC value
 uint16_t ADC0VAL;
 
-void read_camera(){
-	 line[127] = 0
+uint16_t * read_camera(){
+	 line[127] = 0;
 
 	 //enable interrupts
 	 FTM2_SC |= FTM_SC_TOIE_MASK;
@@ -78,6 +78,8 @@ void read_camera(){
 	 //disable interrupts
 	 FTM2_SC &= ~FTM_SC_TOIE_MASK;
 	 PIT_TCTRL0 &= ~PIT_TCTRL_TIE_MASK;
+
+	 return *line;
 
 }
 
