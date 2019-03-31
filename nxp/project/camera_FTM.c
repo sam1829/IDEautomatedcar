@@ -49,8 +49,8 @@ uint16_t *read_camera()
 	line[127] = 0;
 
 	//enable interrupts
-	//FTM2_SC |= FTM_SC_TOIE_MASK;
-	//PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK;
+	FTM2_SC |= FTM_SC_TOIE_MASK;
+	PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK;
 
 	while (line[127] == 0)
 	{
@@ -283,7 +283,7 @@ void init_ADC0(void)
 	// Set to single ended mode
 	ADC0_SC1A = 0;
 	ADC0_SC1A |= ADC_SC1_AIEN_MASK;
-	ADC0_SC1A |= ADC_SC1_ADCH(1);
+	ADC0_SC1A |= ADC_SC1_ADCH(0);
 	ADC0_SC1A &= ~ADC_SC1_DIFF_MASK;
 
 	// Set up FTM2 trigger on ADC0
