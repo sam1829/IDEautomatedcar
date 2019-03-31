@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Freescale Cup linescan camera code
  *
  *	This method of capturing data from the line
@@ -23,28 +23,8 @@
  */
 
 #include "MK64F12.h"
-#include "uart.h"
 #include "stdio.h"
-
-// Default System clock value
-// period = 1/20485760  = 4.8814395e-8
-#define DEFAULT_SYSTEM_CLOCK 20485760u
-// Integration time (seconds)
-// Determines how high the camera values are
-// Don't exceed 100ms or the caps will saturate
-// Must be above 1.25 ms based on camera clk
-//	(camera clk is the mod value set in FTM2)
-#define INTEGRATION_TIME .0075f
-
-void init_FTM2(void);
-void init_GPIO(void);
-void init_PIT(void);
-void init_ADC0(void);
-void FTM2_IRQHandler(void);
-void PIT1_IRQHandler(void);
-void ADC0_IRQHandler(void);
-void LED_Init(void);
-uint16_t *read_camera(void);
+#include "camera_FTM.h"
 
 // Pixel counter for camera logic
 // Starts at -2 so that the SI pulse occurs
@@ -80,7 +60,7 @@ uint16_t *read_camera()
 	FTM2_SC &= ~FTM_SC_TOIE_MASK;
 	PIT_TCTRL0 &= ~PIT_TCTRL_TIE_MASK;
 
-	return *line;
+	return line;
 }
 
 /*�ADC0�Conversion�Complete�ISR� */

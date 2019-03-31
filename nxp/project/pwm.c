@@ -10,16 +10,7 @@
 #include "MK64F12.h"
 #include "pwm.h"
 
-/*From clock setup 0 in system_MK64f12.c*/
-#define DEFAULT_SYSTEM_CLOCK 20485760u /* Default System clock value */
-#define CLOCK 20485760u
-#define PWM_FREQUENCY0 10000
-#define FTM0_MOD_VALUE (CLOCK / PWM_FREQUENCY0)
-#define PWM_FREQUENCY3 50
-#define FTM3_MOD_VALUE (CLOCK / (1 << 7) / PWM_FREQUENCY3)
 
-static volatile unsigned int PWMTick0 = 0;
-static volatile unsigned int PWMTick3 = 0;
 
 /*
  * Change the Motor Duty Cycle and Frequency
@@ -55,7 +46,7 @@ void SetDutyCycle0(unsigned int DutyCycle, unsigned int Frequency, int dir)
 /*
  * Initialize the FlexTimer for PWM
  */
-void InitPWM0()
+void InitPWM0(void)
 {
 	// 12.2.13 Enable the Clock to the FTM0 Module
 	SIM_SCGC6 |= SIM_SCGC6_FTM0_MASK;
@@ -150,7 +141,7 @@ void SetDutyCycle3(unsigned int DutyCycle, unsigned int Frequency)
 /*
  * Initialize the FlexTimer for PWM
  */
-void InitPWM3()
+void InitPWM3(void)
 {
 	// 12.2.13 Enable the Clock to the FTM0 Module
 	SIM_SCGC3 |= SIM_SCGC3_FTM3_MASK;

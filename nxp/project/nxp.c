@@ -7,18 +7,15 @@
  */
 
 #include "MK64F12.h"
+#include "stdio.h"
 #include "uart.h"
+#include "uart3.h"
 #include "pwm.h"
-#include "filter.c"
+#include "camera_FTM.h"
 
-#define CAMERA_LENGTH 128
 void initialize(void);
 void delay(int del);
-
-void put3(char *ptr_str);
-void uart_init3(void);
-uint8_t uart_getchar3(void);
-void uart_putchar3(char ch);
+void convolve(uint16_t *input, double *output, int length, double *h, int h_length);
 
 int main(void)
 {
@@ -32,21 +29,33 @@ int main(void)
 	for (;;)
 	{
 		line = read_camera();
-		uint16_t output[128];
-		float conv = {1.0, 1.0, 1.0};
-		convolve(line, output, CAMERA_LENGTH, &conv, 3);
+		double output[128];
+		double conv[3] = {1.0, 1.0, 1.0};
+		convolve(line, output, 128, conv, 3);
 		//GPIOB_PCOR |= (1 << 22);
 		// send the array over uart
 		sprintf(str, "%i\n\r", -1); // start value
-		put(str);
+		uart3_put(str);
 		for (i = 0; i < 127; i++)
 		{
 			sprintf(str, "%i\n", line[i]);
-			put(str);
+			uart3_put(str);
 		}
 		sprintf(str, "%i\n\r", -2); // end value
-		put(str);
+		uart3_put(str);
 		//GPIOB_PSOR |= (1 << 22);
+	}
+}
+
+void convolve(uint16_t *input, double *output, int length, double *h, int h_length)
+{
+	for (int i = 0; i <= length - h_length; i++)
+	{
+		output[i] = 0.0;
+		for (int j = 0; j < h_length; j++)
+		{
+			output[i] += input[i + j] * h[h_length - j - 1];
+		}
 	}
 }
 
@@ -67,8 +76,8 @@ void delay(int del)
 void initialize()
 {
 	// Initialize UART
-	uart_init();
-	uart_init3();
+	uart0_init();
+	uart3_init();
 
 	// Initialize the FlexTimer for motors
 	InitPWM0();
@@ -82,8 +91,3 @@ void initialize()
 	*/
 }
 
-void put3(char *ptr_str)
-{
-	while (*ptr_str)
-		uart_putchar3(*ptr_str++);
-}

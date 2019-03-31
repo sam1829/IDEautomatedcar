@@ -398,9 +398,9 @@
               <FilePath>.\uart.c</FilePath>
             </File>
             <File>
-              <FileName>main.c</FileName>
+              <FileName>nxp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\main.c</FilePath>
+              <FilePath>.\nxp.c</FilePath>
             </File>
             <File>
               <FileName>uart3.c</FileName>
