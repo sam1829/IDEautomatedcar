@@ -26,6 +26,8 @@ int main(void)
 	initialize();
 	uint16_t *line;
 
+	char str[100];
+	int i;
 	// Print welcome over serial
 	for (;;)
 	{
@@ -33,7 +35,18 @@ int main(void)
 		uint16_t output[128];
 		float conv = {1.0, 1.0, 1.0};
 		convolve(line, output, CAMERA_LENGTH, &conv, 3);
-		uart_putchar3('q');
+		//GPIOB_PCOR |= (1 << 22);
+		// send the array over uart
+		sprintf(str, "%i\n\r", -1); // start value
+		put(str);
+		for (i = 0; i < 127; i++)
+		{
+			sprintf(str, "%i\n", line[i]);
+			put(str);
+		}
+		sprintf(str, "%i\n\r", -2); // end value
+		put(str);
+		//GPIOB_PSOR |= (1 << 22);
 	}
 }
 
