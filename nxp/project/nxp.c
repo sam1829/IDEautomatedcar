@@ -26,13 +26,14 @@ int main(void)
 	char str[100];
 	int i;
 	// Print welcome over serial
+	uart_putchar3('t');
 	for (;;)
 	{
 		line = read_camera();
 		double output[128];
 		double conv[3] = {1.0, 1.0, 1.0};
 		convolve(line, output, 128, conv, 3);
-		//GPIOB_PCOR |= (1 << 22);
+		/*//GPIOB_PCOR |= (1 << 22);
 		// send the array over uart
 		sprintf(str, "%i\n\r", -1); // start value
 		uart_put3(str);
@@ -43,7 +44,7 @@ int main(void)
 		}
 		sprintf(str, "%i\n\r", -2); // end value
 		uart_put3(str);
-		//GPIOB_PSOR |= (1 << 22);
+		//GPIOB_PSOR |= (1 << 22);*/
 	}
 }
 
@@ -82,12 +83,12 @@ void initialize()
 	// Initialize the FlexTimer for motors
 	InitPWM0();
 	InitPWM3();
-	/*
+	
   //camera
   init_GPIO(); // For CLK and SI output on GPIO
 	init_FTM2(); // To generate CLK, SI, and trigger ADC
 	init_ADC0();
 	init_PIT(); // To trigger camera read based on integration time
-	*/
+	
 }
 
