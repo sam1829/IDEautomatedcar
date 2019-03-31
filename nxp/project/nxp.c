@@ -35,14 +35,14 @@ int main(void)
 		//GPIOB_PCOR |= (1 << 22);
 		// send the array over uart
 		sprintf(str, "%i\n\r", -1); // start value
-		uart3_put(str);
+		uart_put3(str);
 		for (i = 0; i < 127; i++)
 		{
 			sprintf(str, "%i\n", line[i]);
-			uart3_put(str);
+			uart_put3(str);
 		}
 		sprintf(str, "%i\n\r", -2); // end value
-		uart3_put(str);
+		uart_put3(str);
 		//GPIOB_PSOR |= (1 << 22);
 	}
 }
@@ -77,7 +77,7 @@ void initialize()
 {
 	// Initialize UART
 	uart0_init();
-	uart3_init();
+	uart_init3();
 
 	// Initialize the FlexTimer for motors
 	InitPWM0();
