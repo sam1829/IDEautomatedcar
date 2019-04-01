@@ -86,3 +86,9 @@ void uart0_put(char *ptr_str){
         
 }
 
+void put0(char *ptr_str)
+{
+    while (*ptr_str)
+        uart0_putchar(*ptr_str++);
+}
+

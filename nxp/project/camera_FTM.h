@@ -10,7 +10,7 @@
 // Must be above 1.25 ms based on camera clk
 //	(camera clk is the mod value set in FTM2)
 #define INTEGRATION_TIME .0075f
-
+extern int line[128];
 void init_FTM2(void);
 void init_GPIO(void);
 void init_PIT(void);
@@ -19,5 +19,5 @@ void FTM2_IRQHandler(void);
 void PIT1_IRQHandler(void);
 void ADC0_IRQHandler(void);
 void LED_Init(void);
-uint16_t *read_camera(void);
+void read_camera(void);
 #endif  /*  ifndef  CAMERA_FTM  */

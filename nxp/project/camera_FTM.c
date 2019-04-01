@@ -24,6 +24,7 @@
 
 #include "MK64F12.h"
 #include "stdio.h"
+#include "string.h"
 #include "camera_FTM.h"
 
 // Pixel counter for camera logic
@@ -33,7 +34,8 @@ int pixcnt = -2;
 // clkval toggles with each FTM interrupt
 int clkval = 0;
 // line stores the current array of camera data
-uint16_t line[128];
+int line[128];
+int lineBuff[128];
 
 // These variables are for streaming the camera
 //	 data over UART
@@ -44,23 +46,22 @@ char str[100];
 // ADC0VAL holds the current ADC value
 uint16_t ADC0VAL;
 
-uint16_t *read_camera()
+void read_camera()
 {
-	line[127] = 0;
+	memcpy(line, lineBuff, sizeof lineBuff);
+	//line[127] = 0;
 
 	//enable interrupts
-	FTM2_SC |= FTM_SC_TOIE_MASK;
-	PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK;
+	//FTM2_SC |= FTM_SC_TOIE_MASK;
+	//PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK;
 
-	while (line[127] == 0)
-	{
-	}
+	//while (line[127] == 0)
+	//{
+	//}
 
 	//disable interrupts
-	FTM2_SC &= ~FTM_SC_TOIE_MASK;
-	PIT_TCTRL0 &= ~PIT_TCTRL_TIE_MASK;
-
-	return line;
+	//FTM2_SC &= ~FTM_SC_TOIE_MASK;
+	//PIT_TCTRL0 &= ~PIT_TCTRL_TIE_MASK;
 }
 
 /*�ADC0�Conversion�Complete�ISR� */
@@ -68,7 +69,7 @@ void ADC0_IRQHandler(void)
 {
 	// Reading ADC0_RA clears the conversion complete flag
 	// Read the result (upper 12-bits). This also clears the Conversion complete flag.
-	ADC0VAL = ADC0_RA >> 4;
+	ADC0VAL = ADC0_RA;
 }
 
 /*
@@ -95,7 +96,7 @@ void FTM2_IRQHandler(void)
 		{ // check for falling edge
 			// ADC read (note that integer division is
 			//  occurring here for indexing the array)
-			line[pixcnt / 2] = ADC0VAL;
+			lineBuff[pixcnt / 2] = ADC0VAL;
 		}
 		pixcnt += 1;
 	}
@@ -109,7 +110,7 @@ void FTM2_IRQHandler(void)
 		{
 			GPIOB_PCOR |= (1 << 23); // SI = 0
 			// ADC read
-			line[0] = ADC0VAL;
+			lineBuff[0] = ADC0VAL;
 		}
 		pixcnt += 1;
 	}
