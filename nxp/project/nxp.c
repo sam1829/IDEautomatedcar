@@ -16,9 +16,12 @@
 #include "pwm.h"
 #include "camera_FTM.h"
 
-#define HARD_RIGHT 8
-#define CENTER 7
-#define HARD_LEFT 5
+#define HARD_RIGHT 8.5
+#define CENTER 6.75
+#define HARD_LEFT 4.75
+
+#define CENTER_MAX 70
+#define CENTER_MIN 58
 
 #define min(x,y) (x<y) ?1:0
 #define max(x,y) (x>y) ?1:0
@@ -28,6 +31,7 @@ void delay(int del);
 void convolve(int *input, int *output, int length, int *h, int h_length);
 int * findMinMax(int *input, int length, int *output);
 void debugCamera();
+void turn(int center);
 
 int main(void)
 {
@@ -38,7 +42,7 @@ int main(void)
 	uart_putchar3('t');
 	//int i = 3; i>0; i--
 	
-	SetDutyCycle0(70, 10e3, 0);
+	SetDutyCycle0(50, 10e3, 0);
 	for (;;)
 	{
 		
@@ -79,16 +83,31 @@ int main(void)
 		//delay(100);
 		*/
 		
-		
-		if(center > 64+6){
+		turn(center);
+		/*if(center > 64+6){
 			SetDutyCycle3(HARD_RIGHT, 50);
 		}
 		else if (center < 64-6){
 			SetDutyCycle3(HARD_LEFT, 50);
 		} else {
 			SetDutyCycle3(CENTER, 50);
-		}
+		}*/
 	}
+}
+
+void turn(int center){
+	float turn_val = CENTER;
+	if(center > CENTER_MAX){
+			SetDutyCycle3(HARD_RIGHT, 50);
+		}
+		else if (center < CENTER_MIN){
+			SetDutyCycle3(HARD_LEFT, 50);
+		} else {
+			float transform = (HARD_RIGHT - HARD_LEFT)*(CENTER_MAX-CENTER_MIN);
+			turn_val = ((center - CENTER_MIN) * transform) + HARD_LEFT;
+		}
+	SetDutyCycle3(turn_val, 50);
+	
 }
 
 void debugCamera() {

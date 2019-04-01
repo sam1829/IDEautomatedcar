@@ -126,10 +126,10 @@ void FTM0_IRQHandler(void)
  * @param Frequency (~1000 Hz to 20000 Hz)
  * @param dir: 1 for C4 active, else C3 active
  */
-void SetDutyCycle3(unsigned int DutyCycle, unsigned int Frequency)
+void SetDutyCycle3(float DutyCycle, unsigned int Frequency)
 {
 	// Calculate the new cutoff value
-	uint16_t mod = (uint16_t)(((CLOCK / 128 / Frequency) * DutyCycle) / 100);
+	uint16_t mod = (uint16_t)(((CLOCK / 128.0 / Frequency) * DutyCycle) / 100.0);
 
 	// Set outputs
 	FTM3_C4V = mod;
