@@ -83,15 +83,15 @@ int main(void)
 		//delay(100);
 		*/
 		
-		turn(center);
-		/*if(center > 64+6){
+		//turn(center);
+		if(center > 64+6){
 			SetDutyCycle3(HARD_RIGHT, 50);
 		}
 		else if (center < 64-6){
 			SetDutyCycle3(HARD_LEFT, 50);
 		} else {
 			SetDutyCycle3(CENTER, 50);
-		}*/
+		}
 	}
 }
 
