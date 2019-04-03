@@ -20,8 +20,10 @@
 #define CENTER 6.75
 #define HARD_LEFT 4.75
 
-#define CENTER_MAX 70
-#define CENTER_MIN 58
+#define TRUE_CENTER 64
+#define CENTER_RANGE 8
+#define CENTER_MAX (TRUE_CENTER + CENTER_RANGE)
+#define CENTER_MIN (TRUE_CENTER - CENTER_RANGE)
 
 #define min(x,y) (x<y) ?1:0
 #define max(x,y) (x>y) ?1:0
@@ -40,17 +42,17 @@ int main(void)
 
 	// Print welcome over serial
 	uart_putchar3('t');
-	//int i = 3; i>0; i--
-	
-	SetDutyCycle0(50, 10e3, 0);
-	for (;;)
+	//int i = 3; i>=0; i--
+	int i = 3;
+	SetDutyCycle0(40, 10e3, 0);
+	for ( ;;)
 	{
 		
 		//read camera
 		read_camera();
-		/* if(0){
+		if(i==0){
 			debugCamera();
-		}*/
+		}
 		
 		//filter output
 		int output[128];
@@ -63,50 +65,52 @@ int main(void)
 		int conv4[5] = {-1, 0 ,1};
 		convolve(output, line, 128, conv4, 3);
 		memcpy(output, line, sizeof output);
-		/*if(0){
+		if(i==0){
 			put0("After Filter:\n\r");
 			debugCamera();
-		}*/
+		}
 		//min and max
 		int min_max[2]={0,0};
-		findMinMax(output, 128, min_max);
+		findMinMax(output, 120, min_max);
 		int bandwith = min_max[1]-min_max[0];
 		int center = (bandwith/2)+min_max[0];
-		/*
-			char str[100];
+		
+			/*char str[100];
 			sprintf(str, "min:%i\n\r", min_max[0]);
 			put0(str);
 			sprintf(str, "max:%i\n\r", min_max[1]);
 			put0(str);
-		sprintf(str, "center:%i\n\r", center);
+			sprintf(str, "center:%i\n\r", center);
 			put0(str);
-		//delay(100);
-		*/
+		  //delay(100); */
 		
-		//turn(center);
-		if(center > 64+6){
+		
+		turn(center);
+		/*if(center > 64+6){
 			SetDutyCycle3(HARD_RIGHT, 50);
 		}
 		else if (center < 64-6){
 			SetDutyCycle3(HARD_LEFT, 50);
 		} else {
 			SetDutyCycle3(CENTER, 50);
-		}
+		}*/
 	}
 }
 
 void turn(int center){
-	float turn_val = CENTER;
-	if(center > CENTER_MAX){
-			SetDutyCycle3(HARD_RIGHT, 50);
-		}
-		else if (center < CENTER_MIN){
-			SetDutyCycle3(HARD_LEFT, 50);
-		} else {
-			float transform = (HARD_RIGHT - HARD_LEFT)*(CENTER_MAX-CENTER_MIN);
-			turn_val = ((center - (float) CENTER_MIN) * transform) + (float) HARD_LEFT;
-		}
+	float turn_val;
+	if(center >= CENTER_MAX){
+			turn_val = HARD_RIGHT;
+	}
+	else if (center <= CENTER_MIN){
+			turn_val = HARD_LEFT;
+	} else {
+		float old_range = CENTER_MAX - CENTER_MIN;
+		float new_range = HARD_RIGHT - HARD_LEFT;
+		turn_val = ((center - (float) CENTER_MIN) / old_range) * new_range + (float) HARD_LEFT;
+	}
 	SetDutyCycle3(turn_val, 50);
+	
 	
 }
 
