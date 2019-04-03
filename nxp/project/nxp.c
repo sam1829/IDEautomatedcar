@@ -30,7 +30,7 @@ void initialize(void);
 void delay(int del);
 void convolve(int *input, int *output, int length, int *h, int h_length);
 int * findMinMax(int *input, int length, int *output);
-void debugCamera();
+void debugCamera(void);
 void turn(int center);
 
 int main(void)
@@ -104,7 +104,7 @@ void turn(int center){
 			SetDutyCycle3(HARD_LEFT, 50);
 		} else {
 			float transform = (HARD_RIGHT - HARD_LEFT)*(CENTER_MAX-CENTER_MIN);
-			turn_val = ((center - CENTER_MIN) * transform) + HARD_LEFT;
+			turn_val = ((center - (float) CENTER_MIN) * transform) + (float) HARD_LEFT;
 		}
 	SetDutyCycle3(turn_val, 50);
 	
