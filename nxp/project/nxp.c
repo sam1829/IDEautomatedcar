@@ -20,8 +20,8 @@
 #define CENTER 6.75
 #define HARD_LEFT 4.75
 
-#define TRUE_CENTER 64
-#define CENTER_RANGE 8
+#define TRUE_CENTER 60
+#define CENTER_RANGE 6
 #define CENTER_MAX (TRUE_CENTER + CENTER_RANGE)
 #define CENTER_MIN (TRUE_CENTER - CENTER_RANGE)
 
@@ -44,7 +44,7 @@ int main(void)
 	uart_putchar3('t');
 	//int i = 3; i>=0; i--
 	int i = 3;
-	SetDutyCycle0(40, 10e3, 0);
+	SetDutyCycle0(75, 10e3, 0);
 	for ( ;;)
 	{
 		
@@ -85,15 +85,15 @@ int main(void)
 		  //delay(100); */
 		
 		
-		turn(center);
-		/*if(center > 64+6){
+		//turn(center);
+		if(center > CENTER_MAX){
 			SetDutyCycle3(HARD_RIGHT, 50);
 		}
-		else if (center < 64-6){
+		else if (center < CENTER_MIN){
 			SetDutyCycle3(HARD_LEFT, 50);
 		} else {
 			SetDutyCycle3(CENTER, 50);
-		}*/
+		}
 	}
 }
 
