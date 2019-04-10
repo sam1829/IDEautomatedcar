@@ -101,9 +101,9 @@ int main(void)
 
     for (;;)
     {
-        sprintf(str, "\n Decimal: %d Hexadecimal: %x \n\r", ADC1_RA, ADC1_RA);
+        sprintf(str,  "%d\n\r", ADC1_RA);
         put(str);
-				int voltage = (int)(ADC1_RA*(3300.0/(0xffff)));
+				/*int voltage = (int)(ADC1_RA*(3300.0/(0xffff)));
 			  sprintf(str, "\n Voltage mV: %d \n\r", voltage);
 				put(str);
 				int celsius = (voltage - 500) * 0.1;
@@ -111,7 +111,7 @@ int main(void)
         put(str);
         for (i = 0; i < 5000000; ++i)
         {
-        }
+        }*/
     }
 
     return 0;

@@ -93,7 +93,7 @@ int main(void) {
     PDB0_SC |= PDB_SC_SWTRIG_MASK;
  
     for(;;) {
-		sprintf(str,"\n Decimal: %d Hexadecimal: %x \n\r",ADC1_RA,ADC1_RA);
+		sprintf(str,"%d\n\r",ADC1_RA);
 		put(str);
 		for( i=0; i < 5000000; ++i ){
                        

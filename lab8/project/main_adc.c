@@ -12,6 +12,8 @@
 #include "stdio.h"
 #define BUFFER_LENGTH 5
 #define BUFFER_INDEX (BUFFER_LENGTH - 1)
+#define DEFAULT_SYSTEM_CLOCK 20485760u /* Default System clock value */
+int milliCount = 0;
 
 void PDB_INIT(void)
 {
@@ -83,6 +85,49 @@ void DAC0_INIT(void)
     DAC0_C1 = 0;
 }
 
+void initFTM(void)
+{
+	//Enable clock for FTM module (use FTM0)
+	SIM_SCGC6 |= SIM_SCGC6_FTM0_MASK;
+
+	//turn off FTM Mode to  write protection;
+	FTM0_MODE |= FTM_MODE_WPDIS_MASK;
+
+	//divide the input clock down by 128,
+	FTM0_SC |= FTM_SC_PS(7);
+
+	//reset the counter to zero
+	FTM0_CNT = 0;
+
+	//Set the overflow rate
+	//(Sysclock/128)- clock after prescaler
+	//(Sysclock/128)/1000- slow down by a factor of 1000 to go from
+	//Mhz to Khz, then 1/KHz = msec
+	//Every 1msec, the FTM counter will set the overflow flag (TOF) and
+	FTM0_MOD = (DEFAULT_SYSTEM_CLOCK / (1 << 7)) / 1000;
+
+	//Select the System Clock
+	FTM0_SC |= FTM_SC_CLKS(1);
+
+	//Enable the interrupt mask. Timer overflow Interrupt enable
+	FTM0_SC |= FTM_SC_TOIE_MASK;
+	
+	NVIC_EnableIRQ(FTM0_IRQn);
+
+	return;
+}
+
+void FTM0_IRQHandler(void)
+{ //For FTM timer
+
+	//clear interrupt in register FTM0_SC
+	FTM0_SC &= ~FTM_SC_TOF_MASK;
+	//increment if button2 pressed
+	milliCount++;
+
+	return;
+}
+
 int main(void)
 {
     char str[100];
@@ -95,42 +140,46 @@ int main(void)
         0 else
     */
     int heart_beat = 0;
+	  int diff = 0;
     // Initialize UART
     uart0_init();
 
     DAC0_INIT();
     ADC1_INIT();
     PDB_INIT();
+		initFTM();
+		// Start the PDB (ADC Conversions)
+    PDB0_SC |= PDB_SC_SWTRIG_MASK;
     for (;;)
     {
-        // Start the PDB (ADC Conversions)
-        PDB0_SC |= PDB_SC_SWTRIG_MASK;
-        for (int i = 0; i < 1000; i++)
-        {
-            sprintf(str, "%d\n\r", ADC1_RA);
-            put0(str);
-        }
         for (int j = BUFFER_INDEX; j > 0; j--)
         {
             buff[j - 1] = buff[j];
         }
         buff[BUFFER_INDEX] = ADC1_RA;
+				//sprintf(str, "%d\n\r", buff[BUFFER_INDEX]);
+        //put0(str);
         buff[BUFFER_INDEX - 1] = (buff[BUFFER_INDEX - 2] + buff[BUFFER_INDEX]) / 2; //median
-        int diff = buff[BUFFER_INDEX - 1] - buff[1];
-        if (state == 0 && diff > 0)
+				
+        if (state == 0 && buff[BUFFER_INDEX - 1] > 58000)
         {
             state = 1;
         }
-        else if (state == 1 && diff < 0)
-        {
-            state = 2;
-        }
-        else if (state == 2 && diff > 0)
+        else if (state == 1 && buff[BUFFER_INDEX - 1] < 50000)
         {
             state = 0;
-            heart_beat++;
-            put0("Got a heartbeat!");
+					  heart_beat++;
+					  if(heart_beat == 6){
+							sprintf(str, "%f BPM\n\r", ( 60.0/((float) milliCount/1000.0))*heart_beat);
+							heart_beat = 0;
+							milliCount = 0;
+							put0(str);
+						}
         }
+				if (buff[BUFFER_INDEX - 1] > 50000)
+				{
+					 //put0("Got a heartbeat!");
+				}
     }
 
     return 0;
