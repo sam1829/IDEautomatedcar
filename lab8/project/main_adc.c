@@ -10,6 +10,8 @@
 #include "uart.h"
 #include "MK64F12.h"
 #include "stdio.h"
+#define BUFFER_LENGTH 5
+#define BUFFER_INDEX (BUFFER_LENGTH - 1)
 
 void PDB_INIT(void)
 {
@@ -35,7 +37,8 @@ void ADC1_INIT(void)
 
     // Do ADC Calibration for Singled Ended ADC. Do not touch.
     ADC1_SC3 = ADC_SC3_CAL_MASK;
-    while ((ADC1_SC3 & ADC_SC3_CAL_MASK) != 0);
+    while ((ADC1_SC3 & ADC_SC3_CAL_MASK) != 0)
+        ;
     calib = ADC1_CLP0;
     calib += ADC1_CLP1;
     calib += ADC1_CLP2;
@@ -56,7 +59,7 @@ void ADC1_INIT(void)
     ADC1_SC1A &= ~ADC_SC1_ADCH_MASK;
     ADC1_SC1A |= 0x3 << ADC_SC1_ADCH_SHIFT;
     ADC1_SC1A |= ADC_SC1_DIFF_MASK;
-		
+
     // Enable NVIC interrupt
     NVIC_EnableIRQ(ADC1_IRQn);
 }
@@ -82,24 +85,52 @@ void DAC0_INIT(void)
 
 int main(void)
 {
-    int i;
     char str[100];
-    // Enable UART Pins
-    //TODO: Doesn't uart init do this?
-
+    int buff[BUFFER_LENGTH];
+    int beat_detection = 0;
+    int state = 0;
+    /* state machine
+        1 rising beat
+        2 falling
+        0 else
+    */
+    int heart_beat = 0;
     // Initialize UART
     uart0_init();
 
     DAC0_INIT();
     ADC1_INIT();
     PDB_INIT();
-
-    // Start the PDB (ADC Conversions)
-    PDB0_SC |= PDB_SC_SWTRIG_MASK;
-    for (int i = 0; i<1000; i++)
+    for (;;)
     {
-        sprintf(str, "%d\n\r", ADC1_RA);
-        put0(str);
+        // Start the PDB (ADC Conversions)
+        PDB0_SC |= PDB_SC_SWTRIG_MASK;
+        for (int i = 0; i < 1000; i++)
+        {
+            sprintf(str, "%d\n\r", ADC1_RA);
+            put0(str);
+        }
+        for (int j = BUFFER_INDEX; j > 0; j--)
+        {
+            buff[j - 1] = buff[j];
+        }
+        buff[BUFFER_INDEX] = ADC1_RA;
+        buff[BUFFER_INDEX - 1] = (buff[BUFFER_INDEX - 2] + buff[BUFFER_INDEX]) / 2; //median
+        int diff = buff[BUFFER_INDEX - 1] - buff[1];
+        if (state == 0 && diff > 0)
+        {
+            state = 1;
+        }
+        else if (state == 1 && diff < 0)
+        {
+            state = 2;
+        }
+        else if (state == 2 && diff > 0)
+        {
+            state = 0;
+            heart_beat++;
+            put0("Got a heartbeat!");
+        }
     }
 
     return 0;
