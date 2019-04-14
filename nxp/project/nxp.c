@@ -13,6 +13,7 @@
 #include "uart3.h"
 #include "pwm.h"
 #include "camera_FTM.h"
+#include "math.h"
 
 #define HARD_RIGHT 8.5
 #define CENTER 6.75
@@ -26,7 +27,11 @@
 #define min(x, y) (x < y) ? 1 : 0
 #define max(x, y) (x > y) ? 1 : 0
 
-#define Kp 0.5
+#define Kp 0.1
+#define Kp_speed 0.4
+
+#define MAX_SPEED 75
+#define MIN_SPEED 50
 
 void initialize(void);
 void delay(int del);
@@ -34,11 +39,10 @@ void convolve(int *input, int *output, int length, int *h, int h_length);
 int *findMinMax(int *input, int length, int *output);
 void debugCamera(void);
 void turn(int center);
+float clip(float input, float min, float max);
 
 int main(void)
 {
-	float turn_old = CENTER;
-	float errOld1 = 0;
 	// Initialize everything
 	initialize();
 
@@ -46,7 +50,7 @@ int main(void)
 	uart_putchar3('t');
 	//int i = 3; i>=0; i--
 	int i = 3;
-	SetDutyCycle0(75, 10e3, 0);
+	SetDutyCycle0(MAX_SPEED, 10e3, 0);
 	for (;;)
 	{
 
@@ -89,28 +93,31 @@ int main(void)
 		  //delay(100); */
 
 		//PID
-		float err = TRUE_CENTER - center;
-		float turn = turn_old + Kp * (err - errOld1);
-		turn = turn_clip(turn);
-		turn_old = turn;
-		errOld1 = err;
+		float err = center - TRUE_CENTER;
+		float turn = (float) CENTER + (float) Kp * (err);
+		turn = clip(turn, HARD_LEFT, HARD_RIGHT);
 		SetDutyCycle3(turn, 50);
+		
+		//speed
+		float speed = (float) MAX_SPEED - (float) Kp_speed * fabsf(turn - (float) CENTER);
+		speed = clip(speed, MIN_SPEED,MAX_SPEED);
+		SetDutyCycle0(MAX_SPEED, 10e3, 0);
 	}
 }
 
-float turn_clip(float turn)
+float clip(float input, float min, float max)
 {
-	if (turn > HARD_RIGHT)
+	if (input >  max)
 	{
-		return HARD_RIGHT;
+		return max;
 	}
-	else if (turn < HARD_LEFT)
+	else if (input < min)
 	{
-		return HARD_LEFT;
+		return min;
 	}
 	else
 	{
-		return turn;
+		return input;
 	}
 }
 
