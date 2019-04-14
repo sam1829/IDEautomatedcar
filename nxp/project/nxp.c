@@ -6,8 +6,6 @@
  * Modified:
  */
 
-
-
 #include "MK64F12.h"
 #include "stdio.h"
 #include "string.h"
@@ -25,18 +23,22 @@
 #define CENTER_MAX (TRUE_CENTER + CENTER_RANGE)
 #define CENTER_MIN (TRUE_CENTER - CENTER_RANGE)
 
-#define min(x,y) (x<y) ?1:0
-#define max(x,y) (x>y) ?1:0
+#define min(x, y) (x < y) ? 1 : 0
+#define max(x, y) (x > y) ? 1 : 0
+
+#define Kp 0.5
 
 void initialize(void);
 void delay(int del);
 void convolve(int *input, int *output, int length, int *h, int h_length);
-int * findMinMax(int *input, int length, int *output);
+int *findMinMax(int *input, int length, int *output);
 void debugCamera(void);
 void turn(int center);
 
 int main(void)
 {
+	float turn_old = CENTER;
+	float errOld1 = 0;
 	// Initialize everything
 	initialize();
 
@@ -45,15 +47,16 @@ int main(void)
 	//int i = 3; i>=0; i--
 	int i = 3;
 	SetDutyCycle0(75, 10e3, 0);
-	for ( ;;)
+	for (;;)
 	{
-		
+
 		//read camera
 		read_camera();
-		if(i==0){
+		if (i == 0)
+		{
 			debugCamera();
 		}
-		
+
 		//filter output
 		int output[128];
 		int conv[3] = {1, 1, 1};
@@ -62,20 +65,21 @@ int main(void)
 		convolve(output, line, 128, conv2, 3);
 		int conv3[5] = {1, 2, 4, 2, 1};
 		convolve(line, output, 128, conv3, 3);
-		int conv4[5] = {-1, 0 ,1};
+		int conv4[5] = {-1, 0, 1};
 		convolve(output, line, 128, conv4, 3);
 		memcpy(output, line, sizeof output);
-		if(i==0){
+		if (i == 0)
+		{
 			put0("After Filter:\n\r");
 			debugCamera();
 		}
 		//min and max
-		int min_max[2]={0,0};
+		int min_max[2] = {0, 0};
 		findMinMax(output, 120, min_max);
-		int bandwith = min_max[1]-min_max[0];
-		int center = (bandwith/2)+min_max[0];
-		
-			/*char str[100];
+		int bandwith = min_max[1] - min_max[0];
+		int center = (bandwith / 2) + min_max[0];
+
+		/*char str[100];
 			sprintf(str, "min:%i\n\r", min_max[0]);
 			put0(str);
 			sprintf(str, "max:%i\n\r", min_max[1]);
@@ -83,58 +87,92 @@ int main(void)
 			sprintf(str, "center:%i\n\r", center);
 			put0(str);
 		  //delay(100); */
-		
-		
-		//turn(center);
-		if(center > CENTER_MAX){
-			SetDutyCycle3(HARD_RIGHT, 50);
-		}
-		else if (center < CENTER_MIN){
-			SetDutyCycle3(HARD_LEFT, 50);
-		} else {
-			SetDutyCycle3(CENTER, 50);
-		}
+
+		//PID
+		float err = TRUE_CENTER - center;
+		float turn = turn_old + Kp * (err - errOld1);
+		turn = turn_clip(turn);
+		turn_old = turn;
+		errOld1 = err;
+		SetDutyCycle3(turn, 50);
 	}
 }
 
-void turn(int center){
-	float turn_val;
-	if(center >= CENTER_MAX){
-			turn_val = HARD_RIGHT;
+float turn_clip(float turn)
+{
+	if (turn > HARD_RIGHT)
+	{
+		return HARD_RIGHT;
 	}
-	else if (center <= CENTER_MIN){
-			turn_val = HARD_LEFT;
-	} else {
+	else if (turn < HARD_LEFT)
+	{
+		return HARD_LEFT;
+	}
+	else
+	{
+		return turn;
+	}
+}
+
+void turn_simple(int center)
+{
+	if (center > CENTER_MAX)
+	{
+		SetDutyCycle3(HARD_RIGHT, 50);
+	}
+	else if (center < CENTER_MIN)
+	{
+		SetDutyCycle3(HARD_LEFT, 50);
+	}
+	else
+	{
+		SetDutyCycle3(CENTER, 50);
+	}
+}
+
+void turn_linear(int center)
+{
+	float turn_val;
+	if (center >= CENTER_MAX)
+	{
+		turn_val = HARD_RIGHT;
+	}
+	else if (center <= CENTER_MIN)
+	{
+		turn_val = HARD_LEFT;
+	}
+	else
+	{
 		float old_range = CENTER_MAX - CENTER_MIN;
 		float new_range = HARD_RIGHT - HARD_LEFT;
-		turn_val = ((center - (float) CENTER_MIN) / old_range) * new_range + (float) HARD_LEFT;
+		turn_val = ((center - (float)CENTER_MIN) / old_range) * new_range + (float)HARD_LEFT;
 	}
 	SetDutyCycle3(turn_val, 50);
-	
-	
 }
 
-void debugCamera() {
+void debugCamera()
+{
 	char str[100];
 	// send the array over uart
-		for (int i = 0; i < 128; i++)
-		{
-			sprintf(str, "%i\n\r", line[i]);
-			put0(str);
-		}
-	
+	for (int i = 0; i < 128; i++)
+	{
+		sprintf(str, "%i\n\r", line[i]);
+		put0(str);
+	}
 }
 
-int * findMinMax(int *input, int length, int *output)
+int *findMinMax(int *input, int length, int *output)
 {
-	for (int i = 0; i < length; i++) {
-		if(min(input[i], input[output[0]])){
-			output[0]= i;
+	for (int i = 0; i < length; i++)
+	{
+		if (min(input[i], input[output[0]]))
+		{
+			output[0] = i;
 		}
-		if(max(input[i], input[output[1]])){
-			output[1]=i;
+		if (max(input[i], input[output[1]]))
+		{
+			output[1] = i;
 		}
-		
 	}
 	return output;
 }
@@ -174,12 +212,10 @@ void initialize()
 	// Initialize the FlexTimer for motors
 	InitPWM0();
 	InitPWM3();
-	
-  //camera
-  init_GPIO(); // For CLK and SI output on GPIO
+
+	//camera
+	init_GPIO(); // For CLK and SI output on GPIO
 	init_FTM2(); // To generate CLK, SI, and trigger ADC
 	init_ADC0();
 	init_PIT(); // To trigger camera read based on integration time
-	
 }
-
