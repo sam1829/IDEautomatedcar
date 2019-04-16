@@ -157,23 +157,24 @@ int main(void)
             buff[j - 1] = buff[j];
         }
         buff[BUFFER_INDEX] = ADC1_RA;
-				//sprintf(str, "%d\n\r", buff[BUFFER_INDEX]);
-        //put0(str);
-        buff[BUFFER_INDEX - 1] = (buff[BUFFER_INDEX - 2] + buff[BUFFER_INDEX]) / 2; //median
 				
-        if (state == 0 && buff[BUFFER_INDEX - 1] > 58000)
+        //buff[BUFFER_INDEX - 1] = (buff[BUFFER_INDEX - 2] + buff[BUFFER_INDEX]) / 2; //median
+				//sprintf(str, "%d\n\r", buff[BUFFER_INDEX-1]);
+        //put0(str);
+				
+        if (state == 0 && buff[BUFFER_INDEX - 1] > 5400)
         {
             state = 1;
         }
-        else if (state == 1 && buff[BUFFER_INDEX - 1] < 50000)
+        else if (state == 1 && buff[BUFFER_INDEX - 1] < 4000)
         {
             state = 0;
 					  heart_beat++;
 					  if(heart_beat == 6){
 							sprintf(str, "%f BPM\n\r", ( 60.0/((float) milliCount/1000.0))*heart_beat);
+							put0(str);
 							heart_beat = 0;
 							milliCount = 0;
-							put0(str);
 						}
         }
 				if (buff[BUFFER_INDEX - 1] > 50000)
