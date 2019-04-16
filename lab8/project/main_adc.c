@@ -158,7 +158,7 @@ int main(void)
         }
         buff[BUFFER_INDEX] = ADC1_RA;
 				
-        //buff[BUFFER_INDEX - 1] = (buff[BUFFER_INDEX - 2] + buff[BUFFER_INDEX]) / 2; //median
+        buff[BUFFER_INDEX - 1] = (buff[BUFFER_INDEX - 2] + buff[BUFFER_INDEX]) / 2; //median
 				//sprintf(str, "%d\n\r", buff[BUFFER_INDEX-1]);
         //put0(str);
 				
