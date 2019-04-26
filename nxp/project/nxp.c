@@ -59,6 +59,15 @@ int main(void)
 		int bandwith = min_max[1] - min_max[0];
 		int center = (bandwith / 2) + min_max[0];
 
+		//line check
+		int center_value = output[TRUE_CENTER];
+		int value_at_min = output[min_max[0]];
+		if (center_value > ((float)value_at_min * 0.8) && center_value < ((float)value_at_min * 1.2))
+		{
+			SetDutyCycle0(0, 10e3, 0);
+			return 1;
+		}
+
 		//PID
 		float err = center - TRUE_CENTER;
 		float turn = (float)CENTER + (float)Kp * (err);
@@ -85,22 +94,6 @@ float clip(float input, float min, float max)
 	else
 	{
 		return input;
-	}
-}
-
-void turn_simple(int center)
-{
-	if (center > CENTER_MAX)
-	{
-		SetDutyCycle3(HARD_RIGHT, 50);
-	}
-	else if (center < CENTER_MIN)
-	{
-		SetDutyCycle3(HARD_LEFT, 50);
-	}
-	else
-	{
-		SetDutyCycle3(CENTER, 50);
 	}
 }
 
