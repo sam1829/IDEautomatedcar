@@ -17,6 +17,12 @@
 #include "nxp.h"
 #include "isr.h"
 
+int max_speed = MAX_SPEED0;
+int min_speed = MIN_SPEED0;
+int mode = 0;
+
+int iteration = 0;
+
 int main(void)
 {
 	// Initialize everything
@@ -27,14 +33,14 @@ int main(void)
 	SetDutyCycle0(max_speed, 10e3, 0);
 	for (;;)
 	{
-
+		iteration++;
 		//read camera
 		read_camera();
 		if (i == 0)
 		{
 			debugCamera();
 		}
-
+		
 		//filter input
 		int output[128];
 		int conv[3] = {1, 1, 1};
@@ -60,9 +66,7 @@ int main(void)
 		int center = (bandwith / 2) + min_max[0];
 
 		//line check
-		int center_value = output[TRUE_CENTER];
-		int value_at_min = output[min_max[0]];
-		if (center_value > ((float)value_at_min * 0.8) && center_value < ((float)value_at_min * 1.2))
+		if (iteration > 10 && countPeaks(output, 120, output[min_max[1]], output[min_max[0]]) > 5 )
 		{
 			SetDutyCycle0(0, 10e3, 0);
 			return 1;
@@ -79,6 +83,27 @@ int main(void)
 		speed = clip(speed, min_speed, max_speed);
 		SetDutyCycle0(max_speed, 10e3, 0);
 	}
+}
+
+int countPeaks(int *input, int length, int max, int min)
+{
+	int count = 0;
+	int lower_bound_min = (float) min * (float) 1.2;
+	int lower_bound_max = (float) max * (float) 0.8;
+	int upper_bound_min = (float) min * (float) 0.8;
+	int upper_bound_max = (float) max * (float) 1.2;
+	
+	for (int i = 0; i < length; i++)
+	{
+		if(input[i] < upper_bound_min && input[i] > lower_bound_min)
+		{
+			count++;
+		} else if (input[i] < upper_bound_max && input[i] > lower_bound_max)
+		{
+			count++;
+		}
+	}
+	return count;
 }
 
 float clip(float input, float min, float max)
@@ -127,7 +152,7 @@ void debugCamera()
 		put0(str);
 	}
 }
-
+//0 is min, 1 is max
 int *findMinMax(int *input, int length, int *output)
 {
 	for (int i = 0; i < length; i++)
@@ -191,6 +216,7 @@ void initialize()
 	Button_Init();
 	NVIC_EnableIRQ(PORTA_IRQn);
 	//NVIC_EnableIRQ(PORTC_IRQn);
+	PORTA_PCR4 |= PORT_PCR_IRQC(0x9);
 
 	//Init mode
 	mode = 0;

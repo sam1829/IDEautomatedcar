@@ -3,5 +3,4 @@
 void FTM0_IRQHandler(void);
 void PORTA_IRQHandler(void);
 void PORTC_IRQHANDLER(void);
-extern int mode;
 #endif /*  ifndef  ISR_H_  */

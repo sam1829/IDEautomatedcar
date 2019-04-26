@@ -298,7 +298,7 @@ void init_ADC0(void)
 	// Enable NVIC interrupt
 	NVIC_EnableIRQ(ADC0_IRQn);
 }
-void LED_Init(void)
+void LED_Init_Not(void)
 {
 	// Enable clocks on Ports B and E for LED timing
 	SIM_SCGC5 |= SIM_SCGC5_PORTB_MASK;

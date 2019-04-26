@@ -16,19 +16,20 @@
 #define Kp_speed 0.4
 
 //Fast
-#define MAX_SPEED0 80
-#define MIN_SPEED0 50
+#define MAX_SPEED0 40//80
+#define MIN_SPEED0 35//50
 
 //Normal
 #define MAX_SPEED1 70
 #define MIN_SPEED1 50
 
 //Slow
-#define MAX_SPEED2 55
-#define MIN_SPEED2 40
+#define MAX_SPEED2 40
+#define MIN_SPEED2 35
 
-extern int max_speed;
-extern int min_speed;
+extern  int max_speed;
+extern  int min_speed;
+extern  int mode;
 
 void initialize(void);
 void delay(int del);
@@ -39,3 +40,4 @@ void turn(int center);
 float clip(float input, float min, float max);
 void LED_Init(void);
 void Button_Init(void);
+int countPeaks(int *input, int length, int max, int min);
