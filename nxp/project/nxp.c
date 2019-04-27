@@ -30,7 +30,8 @@ int main(void)
 	delay(100);
 	//int i = 3; i>=0; i--
 	int i = 3;
-	SetDutyCycle0(max_speed, 10e3, 0);
+	SetDutyCycle0Right(max_speed, 10e3, 0);
+	SetDutyCycle0Left(max_speed, 10e3, 0);
 	for (;;)
 	{
 		iteration++;
@@ -61,27 +62,49 @@ int main(void)
 
 		//min and max
 		int min_max[2] = {0, 0};
-		findMinMax(output, 120, min_max);
+		findMinMax(output, 0, 120, min_max);
 		int bandwith = min_max[1] - min_max[0];
 		int center = (bandwith / 2) + min_max[0];
 
-		//line check
-		if (iteration > 10 && countPeaks(output, 120, output[min_max[1]], output[min_max[0]]) > 5 )
-		{
-			SetDutyCycle0(0, 10e3, 0);
-			return 1;
-		}
 
 		//PID
 		float err = center - TRUE_CENTER;
 		float turn = (float)CENTER + (float)Kp * (err);
 		turn = clip(turn, HARD_LEFT, HARD_RIGHT);
 		SetDutyCycle3(turn, 50);
+		
+		if(iteration > 3 )
+		{
+			int local_min_max[2] = {0, 0};
+			findMinMax(output, min_max[0]+20, min_max[1]-20, local_min_max);
+			if(output[local_min_max[0]] < .4*output[min_max[0]] && output[local_min_max[1]] > .4*output[min_max[1]])
+			{
+				//debugCamera();
+				SetDutyCycle0Right(0, 10e3, 0);
+				SetDutyCycle0Left(0, 10e3, 0);
+				return 1;
+			}
+		}
 
 		//speed
 		float speed = (float)max_speed - (float)Kp_speed * fabsf(turn - (float)CENTER);
 		speed = clip(speed, min_speed, max_speed);
-		SetDutyCycle0(max_speed, 10e3, 0);
+		if(turn > HARD_RIGHT - 0.5)
+		{
+			SetDutyCycle0Right(max_speed-15, 10e3, 0);
+			SetDutyCycle0Left(max_speed, 10e3, 0);
+			
+		} else if(turn < HARD_LEFT + 0.5)
+		{
+			SetDutyCycle0Right(max_speed, 10e3, 0);
+			SetDutyCycle0Left(max_speed-15, 10e3, 0);
+			
+		} else
+		{
+			SetDutyCycle0Right(max_speed, 10e3, 0);
+			SetDutyCycle0Left(max_speed, 10e3, 0);
+		}
+		
 	}
 }
 
@@ -153,9 +176,9 @@ void debugCamera()
 	}
 }
 //0 is min, 1 is max
-int *findMinMax(int *input, int length, int *output)
+int *findMinMax(int *input, int start, int end, int *output)
 {
-	for (int i = 0; i < length; i++)
+	for (int i = start; i < end; i++)
 	{
 		if (min(input[i], input[output[0]]))
 		{

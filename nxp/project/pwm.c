@@ -18,7 +18,32 @@
  * @param Frequency (~1000 Hz to 20000 Hz)
  * @param dir: 1 for C4 active, else C3 active
  */
-void SetDutyCycle0(unsigned int DutyCycle, unsigned int Frequency, int dir)
+void SetDutyCycle0Left(unsigned int DutyCycle, unsigned int Frequency, int dir)
+{
+	// Calculate the new cutoff value
+	uint16_t mod = (uint16_t)(((CLOCK / Frequency) * DutyCycle) / 100);
+
+	// Set outputs
+	if (dir == 1)
+	{
+		//FTM0_C3V = mod;
+		//FTM0_C2V = 0;
+		FTM0_C1V = mod;
+		FTM0_C0V = 0;
+	}
+	else
+	{
+		//FTM0_C2V = mod;
+		//FTM0_C3V = 0;
+		FTM0_C0V = mod;
+		FTM0_C1V = 0;
+	}
+
+	// Update the clock to the new frequency
+	FTM0_MOD = (CLOCK / Frequency);
+}
+
+void SetDutyCycle0Right(unsigned int DutyCycle, unsigned int Frequency, int dir)
 {
 	// Calculate the new cutoff value
 	uint16_t mod = (uint16_t)(((CLOCK / Frequency) * DutyCycle) / 100);
@@ -28,15 +53,15 @@ void SetDutyCycle0(unsigned int DutyCycle, unsigned int Frequency, int dir)
 	{
 		FTM0_C3V = mod;
 		FTM0_C2V = 0;
-		FTM0_C1V = mod;
-		FTM0_C0V = 0;
+		//FTM0_C1V = mod;
+		//FTM0_C0V = 0;
 	}
 	else
 	{
 		FTM0_C2V = mod;
 		FTM0_C3V = 0;
-		FTM0_C0V = mod;
-		FTM0_C1V = 0;
+		//FTM0_C0V = mod;
+		//FTM0_C1V = 0;
 	}
 
 	// Update the clock to the new frequency

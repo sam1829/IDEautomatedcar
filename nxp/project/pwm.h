@@ -16,7 +16,8 @@ void SetDutyCycle0(unsigned int DutyCycle, unsigned int Frequency, int dir);
 void InitPWM0(void);
 void PWM_ISR0(void);
 void SetDutyCycle3(float DutyCycle, unsigned int Frequency);
-void SetDutyCycle0(unsigned int DutyCycle, unsigned int Frequency, int dir);
+void SetDutyCycle0Right(unsigned int DutyCycle, unsigned int Frequency, int dir);
+void SetDutyCycle0Left(unsigned int DutyCycle, unsigned int Frequency, int dir);
 void InitPWM3(void);
 void PWM_ISR3(void);
 

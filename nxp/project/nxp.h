@@ -16,16 +16,16 @@
 #define Kp_speed 0.4
 
 //Fast
-#define MAX_SPEED0 40//80
-#define MIN_SPEED0 35//50
+#define MAX_SPEED0 80
+#define MIN_SPEED0 50
 
 //Normal
-#define MAX_SPEED1 70
+#define MAX_SPEED1 75
 #define MIN_SPEED1 50
 
 //Slow
-#define MAX_SPEED2 40
-#define MIN_SPEED2 35
+#define MAX_SPEED2 65
+#define MIN_SPEED2 50
 
 extern  int max_speed;
 extern  int min_speed;
@@ -34,7 +34,7 @@ extern  int mode;
 void initialize(void);
 void delay(int del);
 void convolve(int *input, int *output, int length, int *h, int h_length);
-int *findMinMax(int *input, int length, int *output);
+int *findMinMax(int *input, int start, int end, int *output);
 void debugCamera(void);
 void turn(int center);
 float clip(float input, float min, float max);
