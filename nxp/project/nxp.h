@@ -16,11 +16,11 @@
 #define Kp_speed 0.4
 
 //Fast
-#define MAX_SPEED0 85
+#define MAX_SPEED0 80
 #define MIN_SPEED0 50
 
 //Normal
-#define MAX_SPEED1 75
+#define MAX_SPEED1 75//75
 #define MIN_SPEED1 50
 
 //Slow
