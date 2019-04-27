@@ -22,7 +22,7 @@ int min_speed = MIN_SPEED0;
 int mode = 0;
 
 int iteration = 0;
-
+int original[128];
 int main(void)
 {
 	// Initialize everything
@@ -42,8 +42,10 @@ int main(void)
 			debugCamera();
 		}
 		
+		
 		//filter input
 		int output[128];
+		memcpy(original, line, sizeof original);
 		int conv[3] = {1, 1, 1};
 		convolve(line, output, 128, conv, 3);
 		int conv2[3] = {2, 4, 2};
@@ -77,9 +79,15 @@ int main(void)
 		{
 			int local_min_max[2] = {0, 0};
 			findMinMax(output, min_max[0]+20, min_max[1]-20, local_min_max);
-			if(output[local_min_max[0]] < .4*output[min_max[0]] && output[local_min_max[1]] > .4*output[min_max[1]])
+			if(countPeaks(output, 120, output[min_max[0]], output[min_max[1]]) < 15 
+				&& output[local_min_max[0]] < .2*output[min_max[0]] 
+				&& output[local_min_max[1]] > .2*output[min_max[1]])
 			{
-				//debugCamera();
+				memcpy(line, original, sizeof output);
+				debugCamera();
+				put0("After Filter:\n\r");
+				memcpy(line, output, sizeof line);
+				debugCamera();
 				SetDutyCycle0Right(0, 10e3, 0);
 				SetDutyCycle0Left(0, 10e3, 0);
 				return 1;
