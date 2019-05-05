@@ -26,10 +26,11 @@ int main(void)
 	// Initialize everything
 	initialize();
 	delay(100);
-	//int i = 3; i>=0; i--
-	int i = 3;
+	//Starting speed
 	SetDutyCycle0Right(max_speed, 10e3, 0);
 	SetDutyCycle0Left(max_speed, 10e3, 0);
+	
+	int i = 1;
 	for (;;)
 	{
 		//read camera
@@ -92,27 +93,6 @@ int main(void)
 	}
 }
 
-int countPeaks(int *input, int length, int max, int min)
-{
-	int count = 0;
-	int lower_bound_min = (float) min * (float) 1.2;
-	int lower_bound_max = (float) max * (float) 0.8;
-	int upper_bound_min = (float) min * (float) 0.8;
-	int upper_bound_max = (float) max * (float) 1.2;
-	
-	for (int i = 0; i < length; i++)
-	{
-		if(input[i] < upper_bound_min && input[i] > lower_bound_min)
-		{
-			count++;
-		} else if (input[i] < upper_bound_max && input[i] > lower_bound_max)
-		{
-			count++;
-		}
-	}
-	return count;
-}
-
 float clip(float input, float min, float max)
 {
 	if (input > max)
@@ -129,26 +109,6 @@ float clip(float input, float min, float max)
 	}
 }
 
-void turn_linear(int center)
-{
-	float turn_val;
-	if (center >= CENTER_MAX)
-	{
-		turn_val = HARD_RIGHT;
-	}
-	else if (center <= CENTER_MIN)
-	{
-		turn_val = HARD_LEFT;
-	}
-	else
-	{
-		float old_range = CENTER_MAX - CENTER_MIN;
-		float new_range = HARD_RIGHT - HARD_LEFT;
-		turn_val = ((center - (float)CENTER_MIN) / old_range) * new_range + (float)HARD_LEFT;
-	}
-	SetDutyCycle3(turn_val, 50);
-}
-
 void debugCamera()
 {
 	char str[100];
@@ -159,6 +119,7 @@ void debugCamera()
 		put0(str);
 	}
 }
+
 //0 is min, 1 is max
 int *findMinMax(int *input, int start, int end, int *output)
 {
@@ -227,7 +188,7 @@ void initialize()
 
 	//Init mode
 	mode = 0;
-	// Red LED
+	// Red LED and Max speed
 	GPIOB_PSOR = (1UL << 21);
 	GPIOB_PCOR = (1UL << 22);
 	GPIOE_PSOR = (1UL << 26);

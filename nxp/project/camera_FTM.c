@@ -49,19 +49,6 @@ uint16_t ADC0VAL;
 void read_camera()
 {
 	memcpy(line, lineBuff, sizeof lineBuff);
-	//line[127] = 0;
-
-	//enable interrupts
-	//FTM2_SC |= FTM_SC_TOIE_MASK;
-	//PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK;
-
-	//while (line[127] == 0)
-	//{
-	//}
-
-	//disable interrupts
-	//FTM2_SC &= ~FTM_SC_TOIE_MASK;
-	//PIT_TCTRL0 &= ~PIT_TCTRL_TIE_MASK;
 }
 
 /*�ADC0�Conversion�Complete�ISR� */
@@ -297,24 +284,4 @@ void init_ADC0(void)
 
 	// Enable NVIC interrupt
 	NVIC_EnableIRQ(ADC0_IRQn);
-}
-void LED_Init_Not(void)
-{
-	// Enable clocks on Ports B and E for LED timing
-	SIM_SCGC5 |= SIM_SCGC5_PORTB_MASK;
-	SIM_SCGC5 |= SIM_SCGC5_PORTE_MASK;
-
-	// Configure the Signal Multiplexer for GPIO
-	PORTB_PCR21 |= PORT_PCR_MUX(1);
-	PORTB_PCR22 |= PORT_PCR_MUX(1);
-	PORTE_PCR26 |= PORT_PCR_MUX(1);
-
-	// Switch the GPIO pins to output mode
-	GPIOB_PDDR |= (1 << 22);
-	GPIOE_PDDR |= (1 << 26);
-	GPIOB_PDDR |= (1 << 21);
-
-	// Turn off the LEDs
-	GPIOB_PSOR = (1UL << 21) | (1UL << 22);
-	GPIOE_PSOR = 1UL << 26;
 }
